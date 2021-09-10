@@ -28,7 +28,7 @@ gem 'pbmenv'
         * https://github.com/splaplapla/procon_bypass_man/archive/refs/tags/v#{version}.tar.gz をダウンロードして、
         * /usr/share/pbm/#{version} に app.rb, pbm.servive, setting.yml を配備する
         * /usr/share/pbm/#{version} を /usr/share/pbm/current へのシムリンクを作成する
-    * Pbmenv.install(version)
+    * Pbmenv.uninstall(version)
         * /usr/share/pbm/current が削除対象だったら例外を投げる
         * /usr/share/pbm/#{version} を 削除する
 

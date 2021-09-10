@@ -10,12 +10,16 @@ module Pbmenv
     "mkdir -p /usr/share/pbm"
   end
 
-  def self.available_pbm_versions
+  def self.available_versions
   end
 
-  def self.installed_pbm_versions
+  def self.versions
   end
 
   def self.install(version)
+  end
+
+  def self.uninstall(version)
+    # TODO
   end
 end
