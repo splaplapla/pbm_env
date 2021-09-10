@@ -1,8 +1,7 @@
 # Pbmenv
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/pbmenv`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+* https://github.com/splaplapla/procon_bypass_man のバージョンマネージャー
+* Raspberry Pi OSでの実行を想定しています
 
 ## Installation
 
@@ -12,23 +11,26 @@ Add this line to your application's Gemfile:
 gem 'pbmenv'
 ```
 
-And then execute:
-
-    $ bundle install
-
-Or install it yourself as:
-
-    $ gem install pbmenv
-
 ## Usage
-
-TODO: Write usage instructions here
-
-## Development
-
-After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
-
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+* pbmenv commands
+    * pbmenv available_versions
+    * pbmenv versions
+    * pbmenv install $version
+    * pbmenv uninstall $version
+* API
+    * Pbmenv.init
+        * "/usr/share/pbm" を作成する
+    * Pbmenv.pbm_versions
+        * https://github.com/splaplapla/procon_bypass_man/tags からバージョンのリストを取ってくる
+    * Pbmenv.pbm_installed_versions
+        * https://github.com/splaplapla/procon_bypass_man/tags からバージョンのリストを取ってくる
+    * Pbmenv.install(version)
+        * https://github.com/splaplapla/procon_bypass_man/archive/refs/tags/v#{version}.tar.gz をダウンロードして、
+        * /usr/share/pbm/#{version} に app.rb, pbm.servive, setting.yml を配備する
+        * /usr/share/pbm/#{version} を /usr/share/pbm/current へのシムリンクを作成する
+    * Pbmenv.install(version)
+        * /usr/share/pbm/current が削除対象だったら例外を投げる
+        * /usr/share/pbm/#{version} を 削除する
 
 ## Contributing
 
