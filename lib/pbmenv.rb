@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "pbmenv/version"
-require_relative "cli"
+require_relative "pbmenv/cli"
 
 module Pbmenv
   class Error < StandardError; end
