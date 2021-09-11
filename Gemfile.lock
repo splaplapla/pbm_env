@@ -36,6 +36,3 @@ DEPENDENCIES
   pry
   rake
   rspec
-
-BUNDLED WITH
-   2.2.27
