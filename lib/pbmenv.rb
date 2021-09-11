@@ -51,9 +51,15 @@ module Pbmenv
 
   def self.uninstall(version)
     raise "Need a version" if version.nil?
+
+    unless File.exists?("/usr/share/pbm/v#{version}")
+      return false
+    end
+    system_with_puts "rm -rf #{PBM_DIR}/v#{version}"
   end
 
   def self.use(version)
+    raise "Need a version" if version.nil?
     unless File.exists?("/usr/share/pbm/v#{version}")
       return false
     end
