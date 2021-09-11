@@ -17,15 +17,12 @@ module Pbmenv
   end
 
   def self.versions
-    Pbmenv::PBM.new.versions.map { |name| name =~ /^v([\d.]+)/ && $1 }.compact
+    Pbmenv::PBM.new.versions.map { |name| Pathname.new(name).basename.to_s =~ /^v([\d.]+)/ && $1 }.compact
   end
 
   def self.install(version)
     raise "Need a version" if version.nil?
 
-    # curl -L https://github.com/splaplapla/procon_bypass_man/archive/refs/tags/v0.1.6.tar.gz | tar xvz
-    # git clone https://github.com/splaplapla/procon_bypass_man.git -b v0.1.6 procon_bypass_man-0.1.6
-    # git clone https://github.com/splaplapla/procon_bypass_man.git procon_bypass_man-0.1.6
     if ENV["DEBUG_INSTALL"]
       shell = <<~SHELL
         git clone https://github.com/splaplapla/procon_bypass_man.git procon_bypass_man-#{version}
