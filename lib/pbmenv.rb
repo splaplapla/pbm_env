@@ -35,21 +35,21 @@ module Pbmenv
         curl -L https://github.com/splaplapla/procon_bypass_man/archive/refs/tags/v#{version}.tar.gz | tar xvz
       SHELL
     end
-    system(shell)
+    system_with_puts(shell)
     unless File.exists?("procon_bypass_man-#{version}/project_template")
       raise "This version is not support by pbmenv"
     end
 
-    system <<~SHELL
+    system_with_puts <<~SHELL
       mkdir -p #{PBM_DIR}/v#{version}
       cp -r procon_bypass_man-#{version}/project_template/* #{PBM_DIR}/v#{version}/
     SHELL
     use version
   rescue => e
-    system "rm -rf #{PBM_DIR}/v#{version}"
+    system_with_puts "rm -rf #{PBM_DIR}/v#{version}"
     raise
   ensure
-    system "rm -rf #{PBM_DIR}/procon_bypass_man-#{version}"
+    system_with_puts "rm -rf procon_bypass_man-#{version}"
   end
 
   def self.uninstall(version)
@@ -62,8 +62,13 @@ module Pbmenv
     end
 
     if File.exists?("#{PBM_DIR}/current")
-      system "unlink #{PBM_DIR}/current"
+      system_with_puts "unlink #{PBM_DIR}/current"
     end
-    system "ln -s #{PBM_DIR}/current #{PBM_DIR}/v#{version}"
+    system_with_puts "ln -s #{PBM_DIR}/v#{version} #{PBM_DIR}/current"
+  end
+
+  def system_with_puts(shell)
+    puts "[SHELL] #{shell}"
+    system(shell)
   end
 end
