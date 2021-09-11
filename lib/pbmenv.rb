@@ -5,12 +5,7 @@ require_relative "pbmenv/cli"
 require_relative "pbmenv/pbm"
 
 module Pbmenv
-  class Error < StandardError; end
   PBM_DIR = "/usr/share/pbm"
-
-  def self.init
-    "mkdir -p #{PBM_DIR}"
-  end
 
   def self.available_versions
     Pbmenv::PBM.new.available_versions.map { |x| x["name"] =~ /^v([\d.]+)/ && $1 }.compact
@@ -38,15 +33,14 @@ module Pbmenv
     end
 
     system_with_puts <<~SHELL
-      mkdir -p #{PBM_DIR}/v#{version}
-      cp -r procon_bypass_man-#{version}/project_template/* #{PBM_DIR}/v#{version}/
+      mkdir -p #{PBM_DIR}/v#{version} && cp -r procon_bypass_man-#{version}/project_template/* #{PBM_DIR}/v#{version}/
     SHELL
     use version
   rescue => e
     system_with_puts "rm -rf #{PBM_DIR}/v#{version}"
     raise
   ensure
-    system_with_puts "rm -rf procon_bypass_man-#{version}"
+    system_with_puts "rm -rf ./procon_bypass_man-#{version}"
   end
 
   # TODO currentが挿しているバージョンはどうする？
@@ -61,6 +55,7 @@ module Pbmenv
 
   def self.use(version)
     raise "Need a version" if version.nil?
+
     unless File.exists?("/usr/share/pbm/v#{version}")
       return false
     end

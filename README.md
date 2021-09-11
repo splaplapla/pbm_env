@@ -18,8 +18,6 @@ gem 'pbmenv'
     * pbmenv install $version
     * pbmenv uninstall $version
 * API
-    * Pbmenv.init
-        * "/usr/share/pbm" を作成する
     * Pbmenv.available_versions
         * https://github.com/splaplapla/procon_bypass_man/tags からバージョンのリストを取ってくる
     * Pbmenv.versions
