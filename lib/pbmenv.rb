@@ -49,6 +49,7 @@ module Pbmenv
     system_with_puts "rm -rf procon_bypass_man-#{version}"
   end
 
+  # TODO currentが挿しているバージョンはどうする？
   def self.uninstall(version)
     raise "Need a version" if version.nil?
 
