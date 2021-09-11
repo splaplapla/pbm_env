@@ -13,8 +13,5 @@ module Pbmenv
     def versions
       Dir.glob("#{Pbmenv::PBM_DIR}/v*")
     end
-
-    def install
-    end
   end
 end
