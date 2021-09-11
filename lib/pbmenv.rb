@@ -21,7 +21,7 @@ module Pbmenv
   end
 
   def self.install(version)
-    raise "Need a version" if sub_command_arg.nil?
+    raise "Need a version" if version.nil?
 
     # curl -L https://github.com/splaplapla/procon_bypass_man/archive/refs/tags/v0.1.6.tar.gz | tar xvz
     # git clone https://github.com/splaplapla/procon_bypass_man.git -b v0.1.6 procon_bypass_man-0.1.6
@@ -39,7 +39,7 @@ module Pbmenv
   end
 
   def self.uninstall(version)
-    raise "Need a version" if sub_command_arg.nil?
+    raise "Need a version" if version.nil?
   end
 
   def self.use(version)
