@@ -20,10 +20,10 @@ gem 'pbmenv'
 * API
     * Pbmenv.init
         * "/usr/share/pbm" を作成する
-    * Pbmenv.pbm_versions
+    * Pbmenv.available_versions
         * https://github.com/splaplapla/procon_bypass_man/tags からバージョンのリストを取ってくる
-    * Pbmenv.pbm_installed_versions
-        * https://github.com/splaplapla/procon_bypass_man/tags からバージョンのリストを取ってくる
+    * Pbmenv.versions
+        * /usr/share/pbm/#{version} を返す
     * Pbmenv.install(version)
         * https://github.com/splaplapla/procon_bypass_man/archive/refs/tags/v#{version}.tar.gz をダウンロードして、
         * /usr/share/pbm/#{version} に app.rb, pbm.servive, setting.yml を配備する

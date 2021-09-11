@@ -13,15 +13,11 @@ module Pbmenv
   end
 
   def self.available_versions
-    Pbmenv::PBM.new.available_versions.map { |x| x["name"] =~ /^v([\d.]+)/ && $1 }.compact.each do |v|
-      puts v
-    end
+    Pbmenv::PBM.new.available_versions.map { |x| x["name"] =~ /^v([\d.]+)/ && $1 }.compact
   end
 
   def self.versions
-    Pbmenv::PBM.new.versions.map { |name| name =~ /^v([\d.]+)/ && $1 }.compact.each do |v|
-      puts v
-    end
+    Pbmenv::PBM.new.versions.map { |name| name =~ /^v([\d.]+)/ && $1 }.compact
   end
 
   def self.install(version)
