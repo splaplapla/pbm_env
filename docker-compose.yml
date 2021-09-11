@@ -5,3 +5,10 @@ services:
       - CI=1
     build: .
     command: bash
+    volumes:
+      - './:/pbmenv'
+      - bundle_path:/bundle
+    environment:
+      - BUNDLE_PATH=/bundle
+volumes:
+  bundle_path:

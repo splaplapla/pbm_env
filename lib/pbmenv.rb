@@ -18,12 +18,11 @@ module Pbmenv
   def self.install(version)
     raise "Need a version" if version.nil?
 
-    download_src
-    system_with_puts(shell)
-    unless File.exists?("procon_bypass_man-#{version}/project_template")
-      raise "This version is not support by pbmenv"
+    if File.exists?("/usr/share/pbm/v#{version}")
+      return false
     end
 
+    download_src(version)
     system_with_puts <<~SHELL
       mkdir -p #{PBM_DIR}/v#{version} && cp -r procon_bypass_man-#{version}/project_template/* #{PBM_DIR}/v#{version}/
     SHELL
@@ -58,12 +57,7 @@ module Pbmenv
     system_with_puts "ln -s #{PBM_DIR}/v#{version} #{PBM_DIR}/current"
   end
 
-  def self.system_with_puts(shell)
-    puts "[SHELL] #{shell}"
-    system(shell)
-  end
-
-  def self.download_src
+  def self.download_src(version)
     if ENV["DEBUG_INSTALL"]
       shell = <<~SHELL
         git clone https://github.com/splaplapla/procon_bypass_man.git procon_bypass_man-#{version}
@@ -73,5 +67,14 @@ module Pbmenv
         curl -L https://github.com/splaplapla/procon_bypass_man/archive/refs/tags/v#{version}.tar.gz | tar xvz
       SHELL
     end
+    system_with_puts(shell)
+    unless File.exists?("procon_bypass_man-#{version}/project_template")
+      raise "This version is not support by pbmenv"
+    end
+  end
+
+  def self.system_with_puts(shell)
+    puts "[SHELL] #{shell}"
+    system(shell)
   end
 end
