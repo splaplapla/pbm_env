@@ -9,6 +9,7 @@ module Pbmenv
         Pbmenv.versions.each { |x| puts x }
       when 'install', 'i'
       when 'uninstall'
+      end
     end
   end
 end
