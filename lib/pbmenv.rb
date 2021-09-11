@@ -18,15 +18,7 @@ module Pbmenv
   def self.install(version)
     raise "Need a version" if version.nil?
 
-    if ENV["DEBUG_INSTALL"]
-      shell = <<~SHELL
-        git clone https://github.com/splaplapla/procon_bypass_man.git procon_bypass_man-#{version}
-      SHELL
-    else
-      shell = <<~SHELL
-        curl -L https://github.com/splaplapla/procon_bypass_man/archive/refs/tags/v#{version}.tar.gz | tar xvz
-      SHELL
-    end
+    download_src
     system_with_puts(shell)
     unless File.exists?("procon_bypass_man-#{version}/project_template")
       raise "This version is not support by pbmenv"
@@ -69,5 +61,17 @@ module Pbmenv
   def self.system_with_puts(shell)
     puts "[SHELL] #{shell}"
     system(shell)
+  end
+
+  def self.download_src
+    if ENV["DEBUG_INSTALL"]
+      shell = <<~SHELL
+        git clone https://github.com/splaplapla/procon_bypass_man.git procon_bypass_man-#{version}
+      SHELL
+    else
+      shell = <<~SHELL
+        curl -L https://github.com/splaplapla/procon_bypass_man/archive/refs/tags/v#{version}.tar.gz | tar xvz
+      SHELL
+    end
   end
 end

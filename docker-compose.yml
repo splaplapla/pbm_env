@@ -1,5 +1,7 @@
 version: '2'
 services:
   app:
+    environment:
+      - CI=1
     build: .
     command: bash
