@@ -67,7 +67,7 @@ module Pbmenv
     system_with_puts "ln -s #{PBM_DIR}/v#{version} #{PBM_DIR}/current"
   end
 
-  def system_with_puts(shell)
+  def self.system_with_puts(shell)
     puts "[SHELL] #{shell}"
     system(shell)
   end
