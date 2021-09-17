@@ -17,6 +17,9 @@ module Pbmenv
 
   def self.install(version)
     raise "Need a version" if version.nil?
+    if version == 'latest'
+      version = available_versions.first
+    end
 
     if File.exists?("/usr/share/pbm/v#{version}")
       return false

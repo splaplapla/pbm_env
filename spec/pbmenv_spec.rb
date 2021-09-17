@@ -33,5 +33,13 @@ describe Pbmenv do
       Pbmenv.uninstall("0.1.6")
       expect(Dir.exists?("/usr/share/pbm/v0.1.6")).to eq(false)
     end
+
+    describe 'provide "latest"' do
+      it do
+        Pbmenv.install("latest")
+        latest_version = Pbmenv.available_versions.first
+        expect(Dir.exists?("/usr/share/pbm/v#{latest_version}")).to eq(true)
+      end
+    end
   end
 end
