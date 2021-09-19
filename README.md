@@ -1,4 +1,5 @@
 # Pbmenv
+[![Ruby](https://github.com/splaplapla/pbmenv/actions/workflows/ruby.yml/badge.svg?branch=master)](https://github.com/splaplapla/pbmenv/actions/workflows/ruby.yml)
 
 * https://github.com/splaplapla/procon_bypass_man のバージョンマネージャー
 * Raspberry Pi OSでの実行を想定しています
