@@ -1,0 +1,22 @@
+name: Ruby
+
+on:
+  [workflow_dispatch]
+
+jobs:
+  release:
+    - uses: actions/checkout@v2
+      - name: Set up Ruby 2.6
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.6
+          bundler-cache: true
+      - name: Publish to RubyGems
+        run: |
+          mkdir -p $HOME/.gem
+          touch $HOME/.gem/credentials
+          chmod 0600 $HOME/.gem/credentials
+          printf -- "---\n:rubygems_api_key: ${GEM_HOST_API_KEY}\n" > $HOME/.gem/credentials
+          bundle exec release
+        env:
+          RUBYGEMS_API_TOKEY: "${{secrets.RUBYGEMS_API_TOKEY}}"
