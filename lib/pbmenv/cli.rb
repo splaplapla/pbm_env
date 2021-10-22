@@ -13,6 +13,13 @@ module Pbmenv
       when 'uninstall'
         sub_command_arg = argv[1]
         Pbmenv.uninstall(sub_command_arg)
+      when '--version'
+        puts Pbmenv::VERSION
+      else
+        puts <<~EOH
+          Unknown command:
+            available commands: available_versions, versions, install, uninstall
+        EOH
       end
     end
   end
