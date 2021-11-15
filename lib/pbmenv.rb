@@ -45,7 +45,9 @@ module Pbmenv
     system_and_puts "rm -rf #{PBM_DIR}/v#{version}"
     raise
   ensure
-    system_and_puts "rm -rf ./procon_bypass_man-#{version}"
+    if Dir.exists?("./procon_bypass_man-#{version}")
+      system_and_puts "rm -rf ./procon_bypass_man-#{version}"
+    end
   end
 
   # TODO currentが挿しているバージョンはどうする？
@@ -77,6 +79,7 @@ module Pbmenv
         git clone https://github.com/splaplapla/procon_bypass_man.git procon_bypass_man-#{version}
       SHELL
     else
+      # TODO cache for testing
       shell = <<~SHELL
         curl -L https://github.com/splaplapla/procon_bypass_man/archive/refs/tags/v#{version}.tar.gz | tar xvz
       SHELL
