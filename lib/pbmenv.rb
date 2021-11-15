@@ -26,15 +26,15 @@ module Pbmenv
     end
 
     download_src(version)
-    system_with_puts <<~SHELL
+    system_and_puts <<~SHELL
       mkdir -p #{PBM_DIR}/v#{version} && cp -r procon_bypass_man-#{version}/project_template/* #{PBM_DIR}/v#{version}/
     SHELL
     use version
   rescue => e
-    system_with_puts "rm -rf #{PBM_DIR}/v#{version}"
+    system_and_puts "rm -rf #{PBM_DIR}/v#{version}"
     raise
   ensure
-    system_with_puts "rm -rf ./procon_bypass_man-#{version}"
+    system_and_puts "rm -rf ./procon_bypass_man-#{version}"
   end
 
   # TODO currentが挿しているバージョンはどうする？
@@ -44,7 +44,7 @@ module Pbmenv
     unless File.exists?("/usr/share/pbm/v#{version}")
       return false
     end
-    system_with_puts "rm -rf #{PBM_DIR}/v#{version}"
+    system_and_puts "rm -rf #{PBM_DIR}/v#{version}"
   end
 
   def self.use(version)
@@ -55,9 +55,9 @@ module Pbmenv
     end
 
     if File.exists?("#{PBM_DIR}/current")
-      system_with_puts "unlink #{PBM_DIR}/current"
+      system_and_puts "unlink #{PBM_DIR}/current"
     end
-    system_with_puts "ln -s #{PBM_DIR}/v#{version} #{PBM_DIR}/current"
+    system_and_puts "ln -s #{PBM_DIR}/v#{version} #{PBM_DIR}/current"
   end
 
   def self.download_src(version)
@@ -70,13 +70,13 @@ module Pbmenv
         curl -L https://github.com/splaplapla/procon_bypass_man/archive/refs/tags/v#{version}.tar.gz | tar xvz
       SHELL
     end
-    system_with_puts(shell)
+    system_and_puts(shell)
     unless File.exists?("procon_bypass_man-#{version}/project_template")
       raise "This version is not support by pbmenv"
     end
   end
 
-  def self.system_with_puts(shell)
+  def self.system_and_puts(shell)
     puts "[SHELL] #{shell}"
     system(shell)
   end
