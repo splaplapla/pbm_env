@@ -42,4 +42,4 @@ The gem is available as open source under the terms of the [MIT License](https:/
 ## Development
 * docker-compose build --no-cache 
 * docker-compose run app bash
-* CI=1 bundle exec rspec
+* bin/rspec

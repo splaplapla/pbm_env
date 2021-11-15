@@ -15,19 +15,37 @@ describe Pbmenv do
     before do
       allow(Pbmenv).to receive(:download_src)
     end
+
     subject { Pbmenv.install("0.1.6") }
+    after(:each) { Pbmenv.uninstall("0.1.6") }
+
+    context 'インストール済みのバージョンがあるとき' do
+      it 'もう一度installしてもエラーにならない' do
+        subject
+        expect { Pbmenv.install("0.1.6") }.not_to raise_error
+      end
+    end
+
     it 'currentにシムリンクが貼っている' do
       subject
       expect(FileTest.symlink?("/usr/share/pbm/current")).to eq(true)
     end
-    it '/usr/share/pbm/0.1.6/ にファイルを作成すること' do
+
+    it '/usr/share/pbm/v0.1.6/ にファイルを作成すること' do
       subject
       expect(Dir.exists?("/usr/share/pbm/v0.1.6")).to eq(true)
     end
-    it '' do
+
+    it 'sheardディレクトリを作成すること' do
       subject
-      expect { Pbmenv.install("0.1.6") }.not_to raise_error
+      expect(Dir.exists?("/usr/share/pbm/shared")).to eq(true)
     end
+
+    it '/usr/share/pbm/v0.1.6/device_idを作成すること' do
+      subject
+      expect(File.symlink?("/usr/share/pbm/v0.1.6/device_id")).to eq(true)
+    end
+
     it 'uninstallできること' do
       subject
       Pbmenv.uninstall("0.1.6")
