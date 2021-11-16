@@ -1,6 +1,9 @@
+## [0.1.5] - 2021-11-16
+
+- `/usr/share/pbm/shared/device_id` を作成するようにしました
 ## [0.1.4] - 2021-11-15
 
-- `/usr/share/pbm/shared/device_id` へのシムリンクを作成するようにしました
+- `/usr/share/pbm/current/device_id` にシムリンクを作成するようにしました
 
 ## [0.1.3] - 2021-10-22
 

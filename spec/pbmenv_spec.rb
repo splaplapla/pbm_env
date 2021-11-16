@@ -46,6 +46,11 @@ describe Pbmenv do
       expect(File.symlink?("/usr/share/pbm/v0.1.6/device_id")).to eq(true)
     end
 
+    it '/usr/share/pbm/shared/device_idを作成すること' do
+      subject
+      expect(File.exists?("/usr/share/pbm/shared/device_id")).to eq(true)
+    end
+
     it 'uninstallできること' do
       subject
       Pbmenv.uninstall("0.1.6")

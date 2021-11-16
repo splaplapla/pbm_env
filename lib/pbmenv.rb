@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "securerandom"
+
 require_relative "pbmenv/version"
 require_relative "pbmenv/cli"
 require_relative "pbmenv/pbm"
@@ -30,16 +32,20 @@ module Pbmenv
       mkdir -p #{PBM_DIR}/v#{version} && cp -r procon_bypass_man-#{version}/project_template/* #{PBM_DIR}/v#{version}/
     SHELL
 
-    # sharedディレクトリを作成して、device_idへのシムリンクを作成する. device_idの中身はpbmで行う
     unless File.exists?("#{PBM_DIR}/shared")
       system_and_puts <<~SHELL
         mkdir -p #{PBM_DIR}/shared
       SHELL
     end
 
+    unless File.exists?("#{PBM_DIR}/shared/device_id")
+      File.write("#{PBM_DIR}/shared/device_id", "d_#{SecureRandom.uuid}")
+    end
+
     system_and_puts <<~SHELL
       ln -s #{PBM_DIR}/shared/device_id #{PBM_DIR}/v#{version}/device_id
     SHELL
+
     use version
   rescue => e
     system_and_puts "rm -rf #{PBM_DIR}/v#{version}"
