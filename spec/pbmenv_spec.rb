@@ -4,10 +4,10 @@ describe Pbmenv do
   before do
     raise("ファイルを読み書きするのでmacではやらない方がいいです") unless ENV["CI"]
   end
-  before(:all) do
-    system "tar zxvf ./spec/files/procon_bypass_man-0.1.6.tar.gz"
+  before(:each) do
+    system "tar zxvf ./spec/files/procon_bypass_man-0.1.6.tar.gz > /dev/null"
   end
-  after(:all) do
+  after(:each) do
     system "rm -rf procon_bypass_man-0.1.6"
   end
 
