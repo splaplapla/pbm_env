@@ -10,6 +10,9 @@ module Pbmenv
       when 'install', 'i'
         sub_command_arg = argv[1]
         Pbmenv.install(sub_command_arg)
+      when 'use', 'u'
+        sub_command_arg = argv[1]
+        Pbmenv.use(sub_command_arg)
       when 'uninstall'
         sub_command_arg = argv[1]
         Pbmenv.uninstall(sub_command_arg)
