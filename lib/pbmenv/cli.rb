@@ -21,7 +21,7 @@ module Pbmenv
       else
         puts <<~EOH
           Unknown command:
-            available commands: available_versions, versions, install, uninstall
+            available commands: available_versions, versions, install, use, uninstall
         EOH
       end
     end
