@@ -4,20 +4,42 @@ describe Pbmenv do
   before do
     raise("ファイルを読み書きするのでmacではやらない方がいいです") unless ENV["CI"]
   end
+
   before(:each) do
     system "tar zxvf ./spec/files/procon_bypass_man-0.1.6.tar.gz > /dev/null"
   end
+
   after(:each) do
     system "rm -rf procon_bypass_man-0.1.6"
   end
 
-  describe 'install, uninstall' do
-    before do
-      allow(Pbmenv).to receive(:download_src)
+  describe '.use' do
+    context 'すでにインストール済みのとき' do
+      before(:each) { Pbmenv.install("0.1.6") }
+      after(:each) { Pbmenv.uninstall("0.1.6") }
+
+      subject { Pbmenv.use("0.1.6") }
+
+      it 'currentにシムリンクが貼っている' do
+        subject
+        expect(File.readlink("/usr/share/pbm/current")).to eq("/usr/share/pbm/v0.1.6")
+      end
+
+      context 'インストールしていないバージョンをuseするとき' do
+        it 'currentのシムリンクを更新しない' do
+          subject
+          Pbmenv.use("0.1.7")
+          expect(File.readlink("/usr/share/pbm/current")).to eq("/usr/share/pbm/v0.1.6")
+        end
+      end
     end
+  end
+
+  describe '.install, .uninstall' do
+    before { allow(Pbmenv).to receive(:download_src) }
+    after(:each) { Pbmenv.uninstall("0.1.6") }
 
     subject { Pbmenv.install("0.1.6") }
-    after(:each) { Pbmenv.uninstall("0.1.6") }
 
     context 'インストール済みのバージョンがあるとき' do
       it 'もう一度installしてもエラーにならない' do
@@ -26,9 +48,9 @@ describe Pbmenv do
       end
     end
 
-    it 'currentにシムリンクが貼っている' do
+    it 'currentにシムリンクが貼っていない' do
       subject
-      expect(FileTest.symlink?("/usr/share/pbm/current")).to eq(true)
+      expect(FileTest.symlink?("/usr/share/pbm/current")).to eq(false)
     end
 
     it '/usr/share/pbm/v0.1.6/ にファイルを作成すること' do

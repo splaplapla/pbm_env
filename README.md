@@ -40,6 +40,6 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/[USERN
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
 
 ## Development
-* docker-compose build --no-cache 
+* docker-compose build --no-cache
 * docker-compose run app bash
 * bin/rspec
