@@ -1,5 +1,6 @@
-## [0.1.6] - 2021-
+## [0.1.6] - 2021-12-01
 - Improve spec
+- installコマンドでcurrentの張り替えをしないようにしました。currentの参照を変えるときはuseコマンドを使ってください
 
 ## [0.1.5] - 2021-11-16
 - `/usr/share/pbm/shared/device_id` を作成するようにしました
