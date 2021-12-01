@@ -1,16 +1,23 @@
 require "spec_helper"
 
 describe Pbmenv do
+  def purge_pbm_dir
+    "sudo rm -rf /usr/share/pbm"
+  end
+
   before do
     raise("ファイルを読み書きするのでmacではやらない方がいいです") unless ENV["CI"]
   end
 
   before(:each) do
+    system "tar zxvf ./spec/files/procon_bypass_man-0.1.5.tar.gz > /dev/null"
     system "tar zxvf ./spec/files/procon_bypass_man-0.1.6.tar.gz > /dev/null"
+    purge_pbm_dir
   end
 
   after(:each) do
     system "rm -rf procon_bypass_man-0.1.6"
+    system "rm -rf procon_bypass_man-0.1.5"
   end
 
   describe '.use' do
@@ -37,46 +44,50 @@ describe Pbmenv do
 
   describe '.install, .uninstall' do
     before { allow(Pbmenv).to receive(:download_src) }
-    after(:each) { Pbmenv.uninstall("0.1.6") }
-
-    subject { Pbmenv.install("0.1.6") }
 
     context 'インストール済みのバージョンがあるとき' do
       it 'もう一度installしてもエラーにならない' do
-        subject
+        Pbmenv.install("0.1.6")
         expect { Pbmenv.install("0.1.6") }.not_to raise_error
       end
     end
 
-    it 'currentにシムリンクが貼っていない' do
-      subject
-      expect(FileTest.symlink?("/usr/share/pbm/current")).to eq(false)
+    context '0.1.6, 0.1.5の順番でインストールするとき' do
+      before do
+        Pbmenv.install("0.1.6")
+        Pbmenv.use("0.1.6")
+        Pbmenv.install("0.1.5")
+      end
+
+      it 'currentに0.1.6のシムリンクは貼らない' do
+        expect(File.readlink("/usr/share/pbm/current")).to eq("/usr/share/pbm/v0.1.6")
+      end
     end
 
-    it '/usr/share/pbm/v0.1.6/ にファイルを作成すること' do
-      subject
-      expect(Dir.exists?("/usr/share/pbm/v0.1.6")).to eq(true)
-    end
+    context '0.1.6をインストールするとき' do
+      before do
+        Pbmenv.install("0.1.6")
+      end
+      it '/usr/share/pbm/v0.1.6/ にファイルを作成すること' do
+        expect(Dir.exists?("/usr/share/pbm/v0.1.6")).to eq(true)
+      end
 
-    it 'sheardディレクトリを作成すること' do
-      subject
-      expect(Dir.exists?("/usr/share/pbm/shared")).to eq(true)
-    end
+      it 'sheardディレクトリを作成すること' do
+        expect(Dir.exists?("/usr/share/pbm/shared")).to eq(true)
+      end
 
-    it '/usr/share/pbm/v0.1.6/device_idを作成すること' do
-      subject
-      expect(File.symlink?("/usr/share/pbm/v0.1.6/device_id")).to eq(true)
-    end
+      it '/usr/share/pbm/v0.1.6/device_idを作成すること' do
+        expect(File.readlink("/usr/share/pbm/v0.1.6/device_id")).to eq("/usr/share/pbm/shared/device_id")
+      end
 
-    it '/usr/share/pbm/shared/device_idを作成すること' do
-      subject
-      expect(File.exists?("/usr/share/pbm/shared/device_id")).to eq(true)
-    end
+      it '/usr/share/pbm/shared/device_idを作成すること' do
+        expect(File.read("/usr/share/pbm/shared/device_id")).to be_a(String)
+      end
 
-    it 'uninstallできること' do
-      subject
-      Pbmenv.uninstall("0.1.6")
-      expect(Dir.exists?("/usr/share/pbm/v0.1.6")).to eq(false)
+      it 'uninstallできること' do
+        Pbmenv.uninstall("0.1.6")
+        expect(Dir.exists?("/usr/share/pbm/v0.1.6")).to eq(false)
+      end
     end
 
     describe 'provide "latest"' do
