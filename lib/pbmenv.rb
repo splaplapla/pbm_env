@@ -45,8 +45,6 @@ module Pbmenv
     system_and_puts <<~SHELL
       ln -s #{PBM_DIR}/shared/device_id #{PBM_DIR}/v#{version}/device_id
     SHELL
-
-    use version
   rescue => e
     system_and_puts "rm -rf #{PBM_DIR}/v#{version}"
     raise

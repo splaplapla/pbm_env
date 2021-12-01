@@ -17,6 +17,7 @@ gem 'pbmenv'
     * pbmenv available_versions
     * pbmenv versions
     * pbmenv install $version
+    * pbmenv use $version
     * pbmenv uninstall $version
 * API
     * Pbmenv.available_versions
@@ -26,6 +27,7 @@ gem 'pbmenv'
     * Pbmenv.install(version)
         * https://github.com/splaplapla/procon_bypass_man/archive/refs/tags/v#{version}.tar.gz をダウンロードして、
         * /usr/share/pbm/#{version} に app.rb, pbm.servive, setting.yml を配備する
+    * Pbmenv.use(version)
         * /usr/share/pbm/#{version} を /usr/share/pbm/current へのシムリンクを作成する
     * Pbmenv.uninstall(version)
         * /usr/share/pbm/current が削除対象だったら例外を投げる
@@ -40,6 +42,6 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/[USERN
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
 
 ## Development
-* docker-compose build --no-cache 
+* docker-compose build --no-cache
 * docker-compose run app bash
 * bin/rspec
