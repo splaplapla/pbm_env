@@ -25,17 +25,34 @@ describe Pbmenv do
       before(:each) { Pbmenv.install("0.1.6") }
       after(:each) { Pbmenv.uninstall("0.1.6") }
 
-      subject { Pbmenv.use("0.1.6") }
+      context 'バージョンを渡すとき' do
+        subject { Pbmenv.use("0.1.6") }
 
-      it 'currentにシムリンクが貼っている' do
-        subject
-        expect(File.readlink("/usr/share/pbm/current")).to eq("/usr/share/pbm/v0.1.6")
+        it 'currentにシムリンクが貼っている' do
+          subject
+          expect(File.readlink("/usr/share/pbm/current")).to eq("/usr/share/pbm/v0.1.6")
+        end
+
+        context 'インストールしていないバージョンをuseするとき' do
+          it 'currentのシムリンクを更新しない' do
+            subject
+            Pbmenv.use("0.1.7")
+            expect(File.readlink("/usr/share/pbm/current")).to eq("/usr/share/pbm/v0.1.6")
+          end
+        end
       end
 
-      context 'インストールしていないバージョンをuseするとき' do
-        it 'currentのシムリンクを更新しない' do
+      context 'latestを渡すとき' do
+        subject { Pbmenv.use("latest") }
+
+        before do
+          allow(Pbmenv).to receive(:download_src)
+          Pbmenv.install("0.1.5")
+          Pbmenv.use("0.1.5")
+        end
+
+        it '最後のバージョンでcurrentにシムリンクが貼っている' do
           subject
-          Pbmenv.use("0.1.7")
           expect(File.readlink("/usr/share/pbm/current")).to eq("/usr/share/pbm/v0.1.6")
         end
       end
