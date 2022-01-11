@@ -74,7 +74,7 @@ module Pbmenv
     raise "Need a version" if version.nil?
     version = versions.last if version == "latest"
 
-    if File.exists?("/usr/share/pbm/#{version}") && File.exists?("/usr/share/pbm/v#{version}")
+    if !File.exists?("/usr/share/pbm/#{version}") && !File.exists?("/usr/share/pbm/v#{version}")
       return false
     end
 
