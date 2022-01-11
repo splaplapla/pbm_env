@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe Pbmenv do
   def purge_pbm_dir
-    "sudo rm -rf /usr/share/pbm"
+    `rm -rf /usr/share/pbm`
   end
 
   before do
