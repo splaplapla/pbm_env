@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "securerandom"
+require "pathname"
 
 require_relative "pbmenv/version"
 require_relative "pbmenv/cli"
