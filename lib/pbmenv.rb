@@ -15,7 +15,7 @@ module Pbmenv
   end
 
   def self.versions
-    Pbmenv::PBM.new.versions.map { |name| Pathname.new(name).basename.to_s =~ /^v([\d.]+)/ && $1 }.compact
+    Pbmenv::PBM.new.versions.map { |name| Pathname.new(name).basename.to_s =~ /^v([\d.]+)/ && $1 }.compact.sort_by {|x| Gem::Version.new(x) }.compact
   end
 
   def self.install(version)
@@ -46,6 +46,11 @@ module Pbmenv
     system_and_puts <<~SHELL
       ln -s #{PBM_DIR}/shared/device_id #{PBM_DIR}/v#{version}/device_id
     SHELL
+
+    # 初回だけinstall時にcurrentを作成する
+    if not File.exists?("#{PBM_DIR}/current")
+      use(version)
+    end
   rescue => e
     system_and_puts "rm -rf #{PBM_DIR}/v#{version}"
     raise
@@ -67,12 +72,9 @@ module Pbmenv
 
   def self.use(version)
     raise "Need a version" if version.nil?
+    version = versions.last if version == "latest"
 
-    unless File.exists?("/usr/share/pbm/#{version}")
-      return false
-    end
-
-    unless File.exists?("/usr/share/pbm/v#{version}")
+    if File.exists?("/usr/share/pbm/#{version}") && File.exists?("/usr/share/pbm/v#{version}")
       return false
     end
 
