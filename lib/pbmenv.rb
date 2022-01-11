@@ -67,6 +67,10 @@ module Pbmenv
   def self.use(version)
     raise "Need a version" if version.nil?
 
+    unless File.exists?("/usr/share/pbm/#{version}")
+      return false
+    end
+
     unless File.exists?("/usr/share/pbm/v#{version}")
       return false
     end
