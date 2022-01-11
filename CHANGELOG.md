@@ -1,3 +1,6 @@
+## [0.1.7] - 2022-01-11
+- currentが存在しないときに、installを実行するとcurrentを貼るようにしました
+
 ## [0.1.6] - 2021-12-01
 - Improve spec
 - installコマンドでcurrentの張り替えをしないようにしました。currentの参照を変えるときはuseコマンドを使ってください

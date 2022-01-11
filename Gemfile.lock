@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    pbmenv (0.1.6)
+    pbmenv (0.1.7)
 
 GEM
   remote: https://rubygems.org/
@@ -30,6 +30,7 @@ GEM
 PLATFORMS
   aarch64-linux
   arm64-darwin-20
+  arm64-darwin-21
   x86_64-linux
 
 DEPENDENCIES
