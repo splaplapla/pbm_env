@@ -78,7 +78,7 @@ module Pbmenv
       return false
     end
 
-    if File.exists?("#{PBM_DIR}/current")
+    if File.symlink?("#{PBM_DIR}/current")
       system_and_puts "unlink #{PBM_DIR}/current"
     end
     system_and_puts "ln -s #{PBM_DIR}/v#{version} #{PBM_DIR}/current"
