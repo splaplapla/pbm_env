@@ -40,6 +40,21 @@ describe Pbmenv do
             expect(File.readlink("/usr/share/pbm/current")).to eq("/usr/share/pbm/v0.1.6")
           end
         end
+
+        context 'プレフィックスにvが付いているとき' do
+          before do
+            allow(Pbmenv).to receive(:download_src)
+            Pbmenv.install("0.1.5")
+          end
+          after do
+            Pbmenv.uninstall("0.1.5")
+          end
+          it 'currentにシムリンクを貼る' do
+            subject
+            Pbmenv.use("v0.1.5")
+            expect(File.readlink("/usr/share/pbm/current")).to eq("/usr/share/pbm/v0.1.5")
+          end
+        end
       end
 
       context 'latestを渡すとき' do

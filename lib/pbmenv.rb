@@ -81,7 +81,12 @@ module Pbmenv
     if File.symlink?("#{PBM_DIR}/current")
       system_and_puts "unlink #{PBM_DIR}/current"
     end
-    system_and_puts "ln -s #{PBM_DIR}/v#{version} #{PBM_DIR}/current"
+
+    if(version_number = version.match(/v?([\w.]+)/)[1])
+      system_and_puts "ln -s #{PBM_DIR}/v#{version_number} #{PBM_DIR}/current"
+    else
+      raise "mismatch version number!"
+    end
   end
 
   def self.download_src(version)
