@@ -94,6 +94,17 @@ describe Pbmenv do
       it 'currentに0.1.6のシムリンクは貼らない' do
         expect(File.readlink("/usr/share/pbm/current")).to eq("/usr/share/pbm/v0.1.6")
       end
+
+      # すでに別のバージョンが入っていないとuseが実行されるので、別のバージョンが入っている必要がある
+      context '0.1.20.1をインストールするとき with use_option' do
+        before do
+          Pbmenv.install("0.1.20.1", use_option: true)
+        end
+
+        it 'currentに0.1.20.1のシムリンクは貼る' do
+          expect(File.readlink("/usr/share/pbm/current")).to eq("/usr/share/pbm/v0.1.20.1")
+        end
+      end
     end
 
     context '0.1.6をインストールするとき' do
