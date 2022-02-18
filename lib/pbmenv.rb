@@ -18,7 +18,7 @@ module Pbmenv
     Pbmenv::PBM.new.versions.map { |name| Pathname.new(name).basename.to_s =~ /^v([\d.]+)/ && $1 }.compact.sort_by {|x| Gem::Version.new(x) }.compact
   end
 
-  def self.install(version, enable_pbm_cloud: false)
+  def self.install(version, use_option: false, enable_pbm_cloud: false)
     raise "Need a version" if version.nil?
     if version == 'latest'
       version = available_versions.first
@@ -56,7 +56,7 @@ module Pbmenv
     SHELL
 
     # 初回だけinstall時にcurrentを作成する
-    if not File.exists?("#{PBM_DIR}/current")
+    if !File.exists?("#{PBM_DIR}/current") || use_option
       use(version)
     end
   rescue => e

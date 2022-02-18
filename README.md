@@ -17,6 +17,8 @@ gem 'pbmenv'
     * pbmenv available_versions
     * pbmenv versions
     * pbmenv install $version
+      * --use
+        * そのまま/usr/share/pbm/currentディレクトリへのシンボリックリンクを貼ります
     * pbmenv use $version
     * pbmenv uninstall $version
 * API

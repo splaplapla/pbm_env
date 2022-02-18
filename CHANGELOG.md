@@ -1,5 +1,7 @@
 ## [0.1.9] - 2022-02-18
 - Pbmenv.installにenable_pbm_cloudオプションを追加しました
+- Pbmenv.installにuse_optionオプションを追加しました
+  - また、 `pbmenv intall xxx --use` が使えるようになりました
 
 ## [0.1.8] - 2022-02-08
 - 不具合修正

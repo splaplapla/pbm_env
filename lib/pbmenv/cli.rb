@@ -9,7 +9,18 @@ module Pbmenv
         Pbmenv.versions.each { |x| puts x }
       when 'install', 'i'
         sub_command_arg = argv[1]
-        Pbmenv.install(sub_command_arg)
+        case argv[2]
+        when "--use"
+          use_option = true
+        when nil
+          use_option = false
+        else
+          puts <<~EOH
+            Unknown option:
+              available options: --use
+          EOH
+        end
+        Pbmenv.install(sub_command_arg, use_option: use_option)
       when 'use', 'u'
         sub_command_arg = argv[1]
         Pbmenv.use(sub_command_arg)
