@@ -12,6 +12,7 @@ describe Pbmenv do
   before(:each) do
     system "tar zxvf ./spec/files/procon_bypass_man-0.1.5.tar.gz > /dev/null"
     system "tar zxvf ./spec/files/procon_bypass_man-0.1.6.tar.gz > /dev/null"
+    system "tar zxvf ./spec/files/procon_bypass_man-0.1.20.1.tar.gz > /dev/null"
     purge_pbm_dir
   end
 
@@ -130,6 +131,16 @@ describe Pbmenv do
       it 'uninstallできること' do
         Pbmenv.uninstall("0.1.6")
         expect(Dir.exists?("/usr/share/pbm/v0.1.6")).to eq(false)
+      end
+    end
+
+    context '0.1.20.1をインストールするとき with enable_pbm_cloud' do
+      before do
+        Pbmenv.install("0.1.20.1", enable_pbm_cloud: true)
+      end
+
+      it do
+        expect(File.read("/usr/share/pbm/current/app.rb")).to include("  config.api_servers = 'https://pbm-cloud.herokuapp.com'")
       end
     end
 

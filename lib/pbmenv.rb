@@ -33,6 +33,14 @@ module Pbmenv
       mkdir -p #{PBM_DIR}/v#{version} && cp -r procon_bypass_man-#{version}/project_template/* #{PBM_DIR}/v#{version}/
     SHELL
 
+    if enable_pbm_cloud
+      text = File.read("#{PBM_DIR}/v#{version}/app.rb")
+      if text =~ /config\.api_servers\s+=\s+\['(https:\/\/.+)'\]/ && (url = $1)
+        text.gsub!(/#\s+config\.api_servers\s+=\s+.+$/, "config.api_servers = '#{url}'")
+      end
+      File.write("#{PBM_DIR}/v#{version}/app.rb", text)
+    end
+
     unless File.exists?("#{PBM_DIR}/shared")
       system_and_puts <<~SHELL
         mkdir -p #{PBM_DIR}/shared
