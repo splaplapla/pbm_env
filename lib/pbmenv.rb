@@ -18,7 +18,7 @@ module Pbmenv
     Pbmenv::PBM.new.versions.map { |name| Pathname.new(name).basename.to_s =~ /^v([\d.]+)/ && $1 }.compact.sort_by {|x| Gem::Version.new(x) }.compact
   end
 
-  def self.install(version)
+  def self.install(version, enable_pbm_cloud: false)
     raise "Need a version" if version.nil?
     if version == 'latest'
       version = available_versions.first
@@ -32,6 +32,20 @@ module Pbmenv
     system_and_puts <<~SHELL
       mkdir -p #{PBM_DIR}/v#{version} && cp -r procon_bypass_man-#{version}/project_template/* #{PBM_DIR}/v#{version}/
     SHELL
+
+    if enable_pbm_cloud
+      text = File.read("#{PBM_DIR}/v#{version}/app.rb")
+      if text =~ /(config.api_servers)/
+        config_attribute = $1
+      end
+      if text =~ /config\.api_servers\s+=\s+\['(https:\/\/.+)'\]/
+        url = $1
+      end
+      if config_attribute && url
+        text.gsub!(/#\s+config\.api_servers\s+=\s+.+$/, "config.api_servers = '#{url}'")
+      end
+      File.write("#{PBM_DIR}/v#{version}/app.rb", text)
+    end
 
     unless File.exists?("#{PBM_DIR}/shared")
       system_and_puts <<~SHELL
