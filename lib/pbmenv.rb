@@ -29,8 +29,16 @@ module Pbmenv
 
     download_src(version)
     system_and_puts <<~SHELL
-      mkdir -p #{PBM_DIR}/v#{version} && cp -r procon_bypass_man-#{version}/project_template/* #{PBM_DIR}/v#{version}/
+      mkdir -p #{PBM_DIR}/v#{version} &&
+        cp procon_bypass_man-#{version}/project_template/app.rb.erb #{PBM_DIR}/v#{version}/
+        cp procon_bypass_man-#{version}/project_template/README #{PBM_DIR}/v#{version}/
+        cp procon_bypass_man-#{version}/project_template/setting.yml #{PBM_DIR}/v#{version}/
+        cp -r procon_bypass_man-#{version}/project_template/systemd_units #{PBM_DIR}/v#{version}/
     SHELL
+
+    # ここでerbを評価する
+    "#{PBM_DIR}/v#{version}/app.rb.erb"
+    "rm #{PBM_DIR}/v#{version}/app.rb"
 
     unless File.exists?("#{PBM_DIR}/shared")
       system_and_puts <<~SHELL
