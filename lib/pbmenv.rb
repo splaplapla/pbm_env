@@ -28,17 +28,31 @@ module Pbmenv
     end
 
     download_src(version)
-    system_and_puts <<~SHELL
-      mkdir -p #{PBM_DIR}/v#{version} &&
-        cp procon_bypass_man-#{version}/project_template/app.rb.erb #{PBM_DIR}/v#{version}/
-        cp procon_bypass_man-#{version}/project_template/README #{PBM_DIR}/v#{version}/
-        cp procon_bypass_man-#{version}/project_template/setting.yml #{PBM_DIR}/v#{version}/
-        cp -r procon_bypass_man-#{version}/project_template/systemd_units #{PBM_DIR}/v#{version}/
-    SHELL
 
-    # ここでerbを評価する
-    "#{PBM_DIR}/v#{version}/app.rb.erb"
-    "rm #{PBM_DIR}/v#{version}/app.rb"
+    if File.exists?(File.join("procon_bypass_man-#{version}/", "project_template/app.rb.erb"))
+      system_and_puts <<~SHELL
+        mkdir -p #{PBM_DIR}/v#{version} &&
+          cp procon_bypass_man-#{version}/project_template/app.rb.erb #{PBM_DIR}/v#{version}/
+          cp procon_bypass_man-#{version}/project_template/README.md #{PBM_DIR}/v#{version}/
+          cp procon_bypass_man-#{version}/project_template/setting.yml #{PBM_DIR}/v#{version}/
+          cp -r procon_bypass_man-#{version}/project_template/systemd_units #{PBM_DIR}/v#{version}/
+      SHELL
+      require "./procon_bypass_man-#{version}/project_template/lib/app_generator"
+
+      AppGenerator.new(
+        prefix_path: "#{PBM_DIR}/v#{version}/",
+        enable_integration_with_pbm_cloud: true,
+      ).generate
+      system_and_puts "#{PBM_DIR}/v#{version}/app.rb.erb"
+    else
+      system_and_puts <<~SHELL
+        mkdir -p #{PBM_DIR}/v#{version} &&
+          cp procon_bypass_man-#{version}/project_template/app.rb #{PBM_DIR}/v#{version}/
+          cp procon_bypass_man-#{version}/project_template/README.md #{PBM_DIR}/v#{version}/
+          cp procon_bypass_man-#{version}/project_template/setting.yml #{PBM_DIR}/v#{version}/
+          cp -r procon_bypass_man-#{version}/project_template/systemd_units #{PBM_DIR}/v#{version}/
+      SHELL
+    end
 
     unless File.exists?("#{PBM_DIR}/shared")
       system_and_puts <<~SHELL
@@ -96,6 +110,7 @@ module Pbmenv
         curl -L https://github.com/splaplapla/procon_bypass_man/archive/refs/tags/v#{version}.tar.gz | tar xvz
       SHELL
     end
+
     system_and_puts(shell)
     unless File.exists?("procon_bypass_man-#{version}/project_template")
       raise "This version is not support by pbmenv"
