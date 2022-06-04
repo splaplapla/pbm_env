@@ -1,8 +1,7 @@
 RSpec.shared_examples 'correct_pbm_dir_spec' do
-  let(:target_version) { raise "Require target_version" }
-
   it '/usr/share/pbm/v#{target_version}/ にファイルを作成すること' do
     subject
+    a_pbm_path = "/usr/share/pbm/v#{target_version}"
     expect(Dir.exists?("/usr/share/pbm/v#{target_version}")).to eq(true)
     expect(File.exists?("/usr/share/pbm/v#{target_version}/app.rb")).to eq(true)
     expect(File.exists?("#{a_pbm_path}/README.md")).to eq(true)
