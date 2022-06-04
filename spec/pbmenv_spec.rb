@@ -10,21 +10,38 @@ describe Pbmenv do
   end
 
   before(:each) do
-    system "tar zxvf ./spec/files/procon_bypass_man-0.1.5.tar.gz > /dev/null"
-    system "tar zxvf ./spec/files/procon_bypass_man-0.1.6.tar.gz > /dev/null"
-    system "tar zxvf ./spec/files/procon_bypass_man-0.1.20.1.tar.gz > /dev/null"
+    allow(Pbmenv).to receive(:to_stdout) if ENV["DISABLE_DEBUG_LOG"]
     purge_pbm_dir
   end
 
   after(:each) do
-    system "rm -rf procon_bypass_man-0.1.6"
-    system "rm -rf procon_bypass_man-0.1.5"
+    purge_pbm_dir
   end
 
   describe '.use' do
-    context 'すでにインストール済みのとき' do
-      before(:each) { Pbmenv.install("0.1.6") }
-      after(:each) { Pbmenv.uninstall("0.1.6") }
+    context 'read donwload', :with_real_download do
+      context 'latestを渡すとき' do
+        subject { Pbmenv.install("0.2.1") && Pbmenv.use("0.2.1") }
+
+        it 'currentにシムリンクが貼っている' do
+          subject
+          latest_version = Pbmenv.available_versions.first
+          expect(File.readlink("/usr/share/pbm/current")).to eq("/usr/share/pbm/v0.2.1")
+        end
+      end
+    end
+
+    context 'すでにインストール済みのとき', :with_decompress_procon_pbm_man do
+      let(:decompress_procon_pbm_man_versions) { ["0.1.5", "0.1.6"] }
+
+      before(:each) do
+        Pbmenv.install("0.1.5")
+        Pbmenv.install("0.1.6")
+      end
+      after(:each) do
+        Pbmenv.uninstall("0.1.5")
+        Pbmenv.uninstall("0.1.6")
+      end
 
       context 'バージョンを渡すとき' do
         subject { Pbmenv.use("0.1.6") }
@@ -43,17 +60,10 @@ describe Pbmenv do
         end
 
         context 'プレフィックスにvが付いているとき' do
-          before do
-            allow(Pbmenv).to receive(:download_src)
-            Pbmenv.install("0.1.5")
-          end
-          after do
-            Pbmenv.uninstall("0.1.5")
-          end
           it 'currentにシムリンクを貼る' do
             subject
-            Pbmenv.use("v0.1.5")
-            expect(File.readlink("/usr/share/pbm/current")).to eq("/usr/share/pbm/v0.1.5")
+            Pbmenv.use("v0.1.6")
+            expect(File.readlink("/usr/share/pbm/current")).to eq("/usr/share/pbm/v0.1.6")
           end
         end
       end
@@ -62,8 +72,6 @@ describe Pbmenv do
         subject { Pbmenv.use("latest") }
 
         before do
-          allow(Pbmenv).to receive(:download_src)
-          Pbmenv.install("0.1.5")
           Pbmenv.use("0.1.5")
         end
 
@@ -76,79 +84,86 @@ describe Pbmenv do
   end
 
   describe '.install, .uninstall' do
-    before { allow(Pbmenv).to receive(:download_src) }
+    context '0.1.6, 0.1.5の順番でインストールするとき', :with_decompress_procon_pbm_man do
+      let(:decompress_procon_pbm_man_versions) { ["0.1.6", "0.1.5", "0.1.20.1"] }
 
-    context 'インストール済みのバージョンがあるとき' do
-      it 'もう一度installしてもエラーにならない' do
-        Pbmenv.install("0.1.6")
-        expect { Pbmenv.install("0.1.6") }.not_to raise_error
-      end
-    end
-
-    context '0.1.6, 0.1.5の順番でインストールするとき' do
-      before do
+      subject do
         Pbmenv.install("0.1.6")
         Pbmenv.use("0.1.6")
         Pbmenv.install("0.1.5")
       end
 
       it 'currentに0.1.6のシムリンクは貼らない' do
+        subject
         expect(File.readlink("/usr/share/pbm/current")).to eq("/usr/share/pbm/v0.1.6")
       end
 
       # すでに別のバージョンが入っていないとuseが実行されるので、別のバージョンが入っている必要がある
       context '0.1.20.1をインストールするとき with use_option' do
-        before do
-          Pbmenv.install("0.1.20.1", use_option: true)
-        end
+        subject { Pbmenv.install("0.1.20.1", use_option: true) }
 
         it 'currentに0.1.20.1のシムリンクは貼る' do
+          subject
           expect(File.readlink("/usr/share/pbm/current")).to eq("/usr/share/pbm/v0.1.20.1")
         end
       end
-    end
 
-    context '0.1.6をインストールするとき' do
-      before do
-        Pbmenv.install("0.1.6")
-      end
-      it '/usr/share/pbm/v0.1.6/ にファイルを作成すること' do
-        expect(Dir.exists?("/usr/share/pbm/v0.1.6")).to eq(true)
-      end
+      context '0.1.6をインストールするとき', :with_decompress_procon_pbm_man do
+        let(:decompress_procon_pbm_man_versions) { ["0.1.6"] }
 
-      it 'sheardディレクトリを作成すること' do
-        expect(Dir.exists?("/usr/share/pbm/shared")).to eq(true)
+        subject { Pbmenv.install("0.1.6") }
+
+        it_behaves_like "correct_pbm_dir_spec" do
+          let(:target_version) { "0.1.6" }
+        end
       end
 
-      it '/usr/share/pbm/v0.1.6/device_idを作成すること' do
-        expect(File.readlink("/usr/share/pbm/v0.1.6/device_id")).to eq("/usr/share/pbm/shared/device_id")
+      context '0.1.20.1をインストールするとき', :with_decompress_procon_pbm_man do
+        let(:decompress_procon_pbm_man_versions) { ["0.1.20.1"] }
+
+        subject { Pbmenv.install("0.1.20.1", enable_pbm_cloud: true) }
+
+        it_behaves_like "correct_pbm_dir_spec" do
+          let(:target_version) { "0.1.20.1" }
+        end
+
+        it "URLの行がアンコメントアウトされていること" do
+          subject
+          expect(File.read("#{a_pbm_path}/app.rb")).to match(%r!^  config.api_servers = \['https://pbm-cloud.herokuapp.com'\]$!)
+        end
       end
 
-      it '/usr/share/pbm/shared/device_idを作成すること' do
-        expect(File.read("/usr/share/pbm/shared/device_id")).to be_a(String)
-      end
+      context '0.2.2をインストールするとき', :with_decompress_procon_pbm_man do
+        let(:decompress_procon_pbm_man_versions) { ["0.2.2"] }
 
-      it 'uninstallできること' do
-        Pbmenv.uninstall("0.1.6")
-        expect(Dir.exists?("/usr/share/pbm/v0.1.6")).to eq(false)
-      end
-    end
+        subject { Pbmenv.install("0.2.2", enable_pbm_cloud: true) }
 
-    context '0.1.20.1をインストールするとき with enable_pbm_cloud' do
-      before do
-        Pbmenv.install("0.1.20.1", enable_pbm_cloud: true)
-      end
+        it_behaves_like "correct_pbm_dir_spec" do
+          let(:target_version) { "0.2.2" }
+        end
 
-      it do
-        expect(File.read("/usr/share/pbm/current/app.rb")).to include("  config.api_servers = 'https://pbm-cloud.herokuapp.com'")
+        it "URLの行がアンコメントアウトされていること" do
+          subject
+          target_version = decompress_procon_pbm_man_versions.first
+          a_pbm_path = "/usr/share/pbm/v#{target_version}"
+          expect(File.exists?("#{a_pbm_path}/app.rb.erb")).to eq(false)
+          # 特定行をアンコメントしていること
+          expect(File.read("#{a_pbm_path}/app.rb")).to match(%r!^  config.api_servers = \['https://pbm-cloud.herokuapp.com'\]$!)
+        end
       end
     end
 
     describe 'provide "latest"' do
-      it do
+      it 'latest versionをインストールすること' do
         Pbmenv.install("latest")
         latest_version = Pbmenv.available_versions.first
-        expect(Dir.exists?("/usr/share/pbm/v#{latest_version}")).to eq(true)
+        version_path = "/usr/share/pbm/v#{latest_version}"
+        expect(Dir.exists?(version_path)).to eq(true)
+        expect(File.exists?("#{version_path}/app.rb")).to eq(true)
+        expect(File.exists?("#{version_path}/README.md")).to eq(true)
+        expect(File.exists?("#{version_path}/setting.yml")).to eq(true)
+        expect(Dir.exists?("/usr/share/pbm/shared")).to eq(true)
+        expect(File.read("/usr/share/pbm/shared/device_id")).to be_a(String)
       end
     end
   end
