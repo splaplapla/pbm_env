@@ -19,24 +19,55 @@ describe Pbmenv do
       before(:each) { Pbmenv.install("0.1.7") }
       after(:each) { Pbmenv.uninstall("0.1.7") }
 
-      subject { Pbmenv.use("0.1.7") }
+      context 'version is latest' do
+        subject { Pbmenv.use("latest") }
 
-      it 'currentにシムリンクが貼っている' do
-        subject
-        expect(File.readlink("/usr/share/pbm/current")).to eq("/usr/share/pbm/v0.1.7")
+        it 'currentにシムリンクが貼っている' do
+          subject
+          expect(File.readlink("/usr/share/pbm/current")).to eq("/usr/share/pbm/v0.1.7")
+        end
+
+        context 'インストールしていないバージョンをuseするとき' do
+          it 'currentのシムリンクを更新しない' do
+            subject
+            Pbmenv.use("0.1.8")
+            expect(File.readlink("/usr/share/pbm/current")).to eq("/usr/share/pbm/v0.1.7")
+          end
+        end
       end
 
-      context 'インストールしていないバージョンをuseするとき' do
-        it 'currentのシムリンクを更新しない' do
+      context 'version is 0.1.7' do
+        subject { Pbmenv.use("0.1.7") }
+
+        it 'currentにシムリンクが貼っている' do
           subject
-          Pbmenv.use("0.1.8")
           expect(File.readlink("/usr/share/pbm/current")).to eq("/usr/share/pbm/v0.1.7")
+        end
+
+        context 'インストールしていないバージョンをuseするとき' do
+          it 'currentのシムリンクを更新しない' do
+            subject
+            Pbmenv.use("0.1.8")
+            expect(File.readlink("/usr/share/pbm/current")).to eq("/usr/share/pbm/v0.1.7")
+          end
         end
       end
     end
   end
 
   describe '.install, .uninstall' do
+    context 'stub download 0.2.2', :with_decompress_procon_pbm_man do
+      let(:decompress_procon_pbm_man_versions) { ["0.2.2"] }
+
+      context 'vプレフィックスがついているとき' do
+        subject { Pbmenv.install("v0.2.2") }
+
+        it_behaves_like "correct_pbm_dir_spec" do
+          let(:target_version) { "0.2.2" }
+        end
+      end
+    end
+
     context 'stub download 0.2.2', :with_decompress_procon_pbm_man do
       let(:decompress_procon_pbm_man_versions) { ["0.2.2"] }
 
