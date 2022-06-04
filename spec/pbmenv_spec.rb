@@ -49,6 +49,10 @@ describe Pbmenv do
       describe '.install' do
         subject { Pbmenv.install("0.2.2") }
 
+        it_behaves_like "correct_pbm_dir_spec" do
+          let(:target_version) { "0.2.2" }
+        end
+
         it 'app.rb.erbを削除していること' do
           subject
           target_version = decompress_procon_pbm_man_versions.first
@@ -63,12 +67,6 @@ describe Pbmenv do
           expect(File.read("#{a_pbm_path}/app.rb")).to match(%r!^  config.api_servers = \['https://pbm-cloud.herokuapp.com'\]$!)
         end
 
-        it '解凍したファイルを削除していること' do
-          subject
-          target_version = decompress_procon_pbm_man_versions.first
-          expect(Dir.exists?("procon_bypass_man-#{target_version}")).to eq(false)
-        end
-
         it 'uninstallしたらディレクトリを消す' do
           subject
           target_version = decompress_procon_pbm_man_versions.first
@@ -78,8 +76,8 @@ describe Pbmenv do
       end
     end
 
-    context 'stub download with 0.1.6, 0.1.5' do
-      before { allow(Pbmenv).to receive(:download_src) }
+    context 'stub download with 0.1.6, 0.1.5', :with_decompress_procon_pbm_man do
+      let(:decompress_procon_pbm_man_versions) { ["0.1.6", "0.1.5"] }
 
       context 'インストール済みのバージョンがあるとき' do
         it 'もう一度installしてもエラーにならない' do
@@ -103,25 +101,13 @@ describe Pbmenv do
       context '0.1.6をインストールするとき' do
         subject { Pbmenv.install("0.1.6") }
 
-        it '/usr/share/pbm/v0.1.6/ にファイルを作成すること' do
-          subject
-          expect(Dir.exists?("/usr/share/pbm/v0.1.6")).to eq(true)
-          expect(File.exists?("/usr/share/pbm/v0.1.6/app.rb")).to eq(true)
+        it_behaves_like "correct_pbm_dir_spec" do
+          let(:target_version) { "0.1.6" }
         end
 
         it 'sheardディレクトリを作成すること' do
           subject
           expect(Dir.exists?("/usr/share/pbm/shared")).to eq(true)
-        end
-
-        it '/usr/share/pbm/v0.1.6/device_idを作成すること' do
-          subject
-          expect(File.readlink("/usr/share/pbm/v0.1.6/device_id")).to eq("/usr/share/pbm/shared/device_id")
-        end
-
-        it '/usr/share/pbm/shared/device_idを作成すること' do
-          subject
-          expect(File.read("/usr/share/pbm/shared/device_id")).to be_a(String)
         end
 
         it 'uninstallできること' do
@@ -134,7 +120,7 @@ describe Pbmenv do
 
     context 'real download' do
       describe 'provide "latest"' do
-        it do
+        it 'latest versionをインストールすること' do
           Pbmenv.install("latest")
           latest_version = Pbmenv.available_versions.first
           version_path = "/usr/share/pbm/v#{latest_version}"
@@ -142,6 +128,8 @@ describe Pbmenv do
           expect(File.exists?("#{version_path}/app.rb")).to eq(true)
           expect(File.exists?("#{version_path}/README.md")).to eq(true)
           expect(File.exists?("#{version_path}/setting.yml")).to eq(true)
+          expect(Dir.exists?("/usr/share/pbm/shared")).to eq(true)
+          expect(File.read("/usr/share/pbm/shared/device_id")).to be_a(String)
         end
       end
     end
