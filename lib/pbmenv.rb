@@ -107,18 +107,23 @@ module Pbmenv
     else
       # TODO cache for testing
       shell = <<~SHELL
-        curl -L https://github.com/splaplapla/procon_bypass_man/archive/refs/tags/v#{version}.tar.gz | tar xvz
+        curl -L https://github.com/splaplapla/procon_bypass_man/archive/refs/tags/v#{version}.tar.gz | tar xvz > /dev/null
       SHELL
     end
 
     system_and_puts(shell)
+
     unless File.exists?("procon_bypass_man-#{version}/project_template")
       raise "This version is not support by pbmenv"
     end
   end
 
   def self.system_and_puts(shell)
-    puts "[SHELL] #{shell}"
+    to_stdout "[SHELL] #{shell}"
     system(shell)
+  end
+
+  def self.to_stdout(text)
+    puts text
   end
 end

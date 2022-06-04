@@ -6,37 +6,31 @@ describe Pbmenv do
   end
 
   before do
+    allow(Pbmenv).to receive(:to_stdout) if ENV["DISABLE_DEBUG_LOG"]
     raise("ファイルを読み書きするのでmacではやらない方がいいです") unless ENV["CI"]
   end
 
-  before(:each) do
-    system "tar zxvf ./spec/files/procon_bypass_man-0.1.5.tar.gz > /dev/null"
-    system "tar zxvf ./spec/files/procon_bypass_man-0.1.6.tar.gz > /dev/null"
-  end
-
   after(:each) do
-    system "rm -rf procon_bypass_man-0.1.6"
-    system "rm -rf procon_bypass_man-0.1.5"
     purge_pbm_dir
   end
 
-  describe '.use' do
+  describe '.use', :with_real_download do
     context 'すでにインストール済みのとき' do
-      before(:each) { Pbmenv.install("0.1.6") }
-      after(:each) { Pbmenv.uninstall("0.1.6") }
+      before(:each) { Pbmenv.install("0.1.7") }
+      after(:each) { Pbmenv.uninstall("0.1.7") }
 
-      subject { Pbmenv.use("0.1.6") }
+      subject { Pbmenv.use("0.1.7") }
 
       it 'currentにシムリンクが貼っている' do
         subject
-        expect(File.readlink("/usr/share/pbm/current")).to eq("/usr/share/pbm/v0.1.6")
+        expect(File.readlink("/usr/share/pbm/current")).to eq("/usr/share/pbm/v0.1.7")
       end
 
       context 'インストールしていないバージョンをuseするとき' do
         it 'currentのシムリンクを更新しない' do
           subject
-          Pbmenv.use("0.1.7")
-          expect(File.readlink("/usr/share/pbm/current")).to eq("/usr/share/pbm/v0.1.6")
+          Pbmenv.use("0.1.8")
+          expect(File.readlink("/usr/share/pbm/current")).to eq("/usr/share/pbm/v0.1.7")
         end
       end
     end
