@@ -57,6 +57,7 @@ describe Pbmenv do
         subject
         version_path = "/usr/share/pbm/v#{target_version}"
         expect(Dir.exists?(version_path)).to eq(true)
+        expect(File.exists?("#{version_path}/app.rb.erb")).to eq(false)
         expect(File.exists?("#{version_path}/app.rb")).to eq(true)
         expect(File.exists?("#{version_path}/README.md")).to eq(true)
         expect(File.exists?("#{version_path}/setting.yml")).to eq(true)

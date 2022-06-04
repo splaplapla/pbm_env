@@ -43,7 +43,7 @@ module Pbmenv
         prefix_path: "#{PBM_DIR}/v#{version}/",
         enable_integration_with_pbm_cloud: true,
       ).generate
-      system_and_puts "#{PBM_DIR}/v#{version}/app.rb.erb"
+      system_and_puts "rm #{PBM_DIR}/v#{version}/app.rb.erb"
     else
       system_and_puts <<~SHELL
         mkdir -p #{PBM_DIR}/v#{version} &&
