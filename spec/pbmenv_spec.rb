@@ -43,24 +43,38 @@ describe Pbmenv do
   end
 
   describe '.install, .uninstall' do
-    context 'stub download 0.2.2' do
-      let(:target_version) { "0.2.2" }
+    context 'stub download 0.2.2', :with_decompress_procon_pbm_man do
+      let(:decompress_procon_pbm_man_versions) { ["0.2.2"] }
 
-      before do
-        system "tar zxvf ./spec/files/procon_bypass_man-0.2.2.tar.gz > /dev/null"
-        allow(Pbmenv).to receive(:download_src)
-      end
+      describe '.install' do
+        subject { Pbmenv.install("0.2.2") }
 
-      subject { Pbmenv.install("0.2.2") }
+        it 'app.rb.erbを削除していること' do
+          subject
+          target_version = decompress_procon_pbm_man_versions.first
+          a_pbm_path = "/usr/share/pbm/v#{target_version}"
+          expect(Dir.exists?(a_pbm_path)).to eq(true)
+          expect(File.exists?("#{a_pbm_path}/app.rb.erb")).to eq(false)
+          expect(File.exists?("#{a_pbm_path}/app.rb")).to eq(true)
+          expect(File.exists?("#{a_pbm_path}/README.md")).to eq(true)
+          expect(File.exists?("#{a_pbm_path}/setting.yml")).to eq(true)
 
-      it do
-        subject
-        version_path = "/usr/share/pbm/v#{target_version}"
-        expect(Dir.exists?(version_path)).to eq(true)
-        expect(File.exists?("#{version_path}/app.rb.erb")).to eq(false)
-        expect(File.exists?("#{version_path}/app.rb")).to eq(true)
-        expect(File.exists?("#{version_path}/README.md")).to eq(true)
-        expect(File.exists?("#{version_path}/setting.yml")).to eq(true)
+          # 特定行をアンコメントしていること
+          expect(File.read("#{a_pbm_path}/app.rb")).to match(%r!^  config.api_servers = \['https://pbm-cloud.herokuapp.com'\]$!)
+        end
+
+        it '解凍したファイルを削除していること' do
+          subject
+          target_version = decompress_procon_pbm_man_versions.first
+          expect(Dir.exists?("procon_bypass_man-#{target_version}")).to eq(false)
+        end
+
+        it 'uninstallしたらディレクトリを消す' do
+          subject
+          target_version = decompress_procon_pbm_man_versions.first
+          a_pbm_path = "/usr/share/pbm/v#{target_version}"
+          expect { Pbmenv.uninstall(target_version) }.to change { Dir.exists?(a_pbm_path) }.from(true).to(false)
+        end
       end
     end
 
