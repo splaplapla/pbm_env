@@ -80,8 +80,17 @@ describe Pbmenv do
   end
 
   describe '.install, .uninstall' do
-    context '0.1.6, 0.1.5の順番でインストールするとき', :with_decompress_procon_pbm_man do
-      let(:decompress_procon_pbm_man_versions) { ["0.1.6", "0.1.5", "0.1.20.1"] }
+    context 'プレフィックスにvが付いているとき', :with_decompress_procon_pbm_man do
+      let(:decompress_procon_pbm_man_versions) { ["0.1.5"] }
+      let(:target_version) { decompress_procon_pbm_man_versions.first }
+
+      subject { Pbmenv.install("v0.1.5") }
+
+      include_examples "correct_pbm_dir_spec"
+    end
+
+      context '0.1.6, 0.1.5の順番でインストールするとき', :with_decompress_procon_pbm_man do
+        let(:decompress_procon_pbm_man_versions) { ["0.1.6", "0.1.5", "0.1.20.1"] }
 
       subject do
         Pbmenv.install("0.1.6")
