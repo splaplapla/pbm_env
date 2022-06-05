@@ -6,6 +6,7 @@ RSpec.shared_examples 'correct_pbm_dir_spec' do
     expect(File.exists?("/usr/share/pbm/v#{target_version}/app.rb")).to eq(true)
     expect(File.exists?("#{a_pbm_path}/README.md")).to eq(true)
     expect(File.exists?("#{a_pbm_path}/setting.yml")).to eq(true)
+    expect(File.exists?("#{a_pbm_path}/systemd_units/pbm.service")).to eq(true)
   end
 
   it '/usr/share/pbm/v#{target_version}/device_idを作成すること' do

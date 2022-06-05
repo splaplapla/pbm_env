@@ -44,7 +44,7 @@ module Pbmenv
 
       AppGenerator.new(
         prefix_path: "#{PBM_DIR}/v#{version}/",
-        enable_integration_with_pbm_cloud: true,
+        enable_integration_with_pbm_cloud: enable_pbm_cloud,
       ).generate
       system_and_puts "rm #{PBM_DIR}/v#{version}/app.rb.erb"
     else
@@ -57,6 +57,7 @@ module Pbmenv
       SHELL
     end
 
+    # 旧実装バージョン
     if enable_pbm_cloud
       text = File.read("#{PBM_DIR}/v#{version}/app.rb")
       if text =~ /config\.api_servers\s+=\s+\['(https:\/\/.+)'\]/ && (url = $1)
