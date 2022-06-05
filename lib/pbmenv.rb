@@ -24,12 +24,12 @@ module Pbmenv
 
   def self.install(version, use_option: false, enable_pbm_cloud: false)
     raise "Need a version" if version.nil?
-
-    if version == 'latest'
-      version = available_versions.first
-    else
-      version = normalize_version(version)
-    end
+    version =
+      if version == 'latest'
+        available_versions.first
+      else
+        normalize_version(version)
+      end
 
     begin
       CreateVersionService.new(version: version, use_option: use_option, enable_pbm_cloud: enable_pbm_cloud).execute!
@@ -62,39 +62,11 @@ module Pbmenv
       Helper.system_and_puts "unlink #{PBM_DIR}/current"
     end
 
-    if(version_number = normalize_version(version.match(/v?([\w.]+)/)[1]))
+    if(version_number = normalize_version(version))
       Helper.system_and_puts "ln -s #{PBM_DIR}/v#{version_number} #{PBM_DIR}/current"
     else
       raise "mismatch version number!"
     end
-  end
-
-  def self.download_src(version)
-    if ENV["DEBUG_INSTALL"]
-      shell = <<~SHELL
-        git clone https://github.com/splaplapla/procon_bypass_man.git procon_bypass_man-#{version}
-      SHELL
-    else
-      # TODO cache for testing
-      shell = <<~SHELL
-        curl -L https://github.com/splaplapla/procon_bypass_man/archive/refs/tags/v#{version}.tar.gz | tar xvz > /dev/null
-      SHELL
-    end
-
-    Helper.system_and_puts(shell)
-
-    unless File.exists?("procon_bypass_man-#{version}/project_template")
-      raise "This version is not support by pbmenv"
-    end
-  end
-
-  def self.system_and_puts(shell)
-    to_stdout "[SHELL] #{shell}"
-    system(shell)
-  end
-
-  def self.to_stdout(text)
-    puts text
   end
 
   def self.normalize_version(version)
