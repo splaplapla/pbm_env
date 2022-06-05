@@ -6,8 +6,10 @@ require "pathname"
 require_relative "pbmenv/version"
 require_relative "pbmenv/cli"
 require_relative "pbmenv/pbm"
+require_relative "pbmenv/helper"
 require_relative "pbmenv/version_pathname"
 require_relative "pbmenv/create_version_service"
+require_relative "pbmenv/download_src_service"
 
 module Pbmenv
   PBM_DIR = "/usr/share/pbm"
@@ -45,7 +47,7 @@ module Pbmenv
     unless File.exists?("/usr/share/pbm/v#{version}")
       return false
     end
-    system_and_puts "rm -rf #{PBM_DIR}/v#{version}"
+    Helper.system_and_puts "rm -rf #{PBM_DIR}/v#{version}"
   end
 
   def self.use(version)
@@ -57,11 +59,11 @@ module Pbmenv
     end
 
     if File.symlink?("#{PBM_DIR}/current")
-      system_and_puts "unlink #{PBM_DIR}/current"
+      Helper.system_and_puts "unlink #{PBM_DIR}/current"
     end
 
     if(version_number = normalize_version(version.match(/v?([\w.]+)/)[1]))
-      system_and_puts "ln -s #{PBM_DIR}/v#{version_number} #{PBM_DIR}/current"
+      Helper.system_and_puts "ln -s #{PBM_DIR}/v#{version_number} #{PBM_DIR}/current"
     else
       raise "mismatch version number!"
     end
@@ -79,7 +81,7 @@ module Pbmenv
       SHELL
     end
 
-    system_and_puts(shell)
+    Helper.system_and_puts(shell)
 
     unless File.exists?("procon_bypass_man-#{version}/project_template")
       raise "This version is not support by pbmenv"

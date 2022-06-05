@@ -18,18 +18,20 @@ module Pbmenv
         raise AlreadyCreatedError
       end
 
-      source_path = download_src(version)
-      build_app_file(source_path: source_path)
-      create_if_miss_shared_dir
-      create_if_miss_device_id_file
-      link_device_id_file(version: version)
-      create_if_miss_current_dir(version: version)
-    rescue => e
-      system_and_puts "rm -rf #{PBM_DIR}/v#{version}"
-      raise
-    ensure
-      if Dir.exists?(source_path)
-        system_and_puts "rm -rf #{source_path}"
+      begin
+        source_path = download_src(version)
+        build_app_file(source_path: source_path)
+        create_if_miss_shared_dir
+        create_if_miss_device_id_file
+        link_device_id_file(version: version)
+        create_if_miss_current_dir(version: version)
+      rescue => e
+        Helper.system_and_puts "rm -rf #{PBM_DIR}/v#{version}"
+        raise
+      ensure
+        if Dir.exists?(source_path)
+          Helper.system_and_puts "rm -rf #{source_path}"
+        end
       end
     end
 
@@ -37,29 +39,13 @@ module Pbmenv
 
     # @return [String]
     def download_src(version)
-      if ENV["DEBUG_INSTALL"]
-        shell = <<~SHELL
-        git clone https://github.com/splaplapla/procon_bypass_man.git procon_bypass_man-#{version}
-        SHELL
-      else
-        # TODO cache for testing
-        shell = <<~SHELL
-        curl -L https://github.com/splaplapla/procon_bypass_man/archive/refs/tags/v#{version}.tar.gz | tar xvz > /dev/null
-        SHELL
-      end
-
-      system_and_puts(shell)
-
-      unless File.exists?("procon_bypass_man-#{version}/project_template")
-        raise NotSupportVersionError, "This version is not support by pbmenv"
-      end
-
+      Pbmenv::DownloadSrcService.new(version).execute!
       return "procon_bypass_man-#{version}"
     end
 
     def build_app_file(source_path: )
       if File.exists?(File.join("procon_bypass_man-#{version}/", "project_template/app.rb.erb"))
-        system_and_puts <<~SHELL
+        Helper.system_and_puts <<~SHELL
           mkdir -p #{PBM_DIR}/v#{version} &&
             cp procon_bypass_man-#{version}/project_template/app.rb.erb #{PBM_DIR}/v#{version}/
             cp procon_bypass_man-#{version}/project_template/README.md #{PBM_DIR}/v#{version}/
@@ -71,9 +57,9 @@ module Pbmenv
           prefix_path: "#{PBM_DIR}/v#{version}/",
           enable_integration_with_pbm_cloud: enable_pbm_cloud,
         ).generate
-        system_and_puts "rm #{PBM_DIR}/v#{version}/app.rb.erb"
+        Helper.system_and_puts "rm #{PBM_DIR}/v#{version}/app.rb.erb"
       else
-        system_and_puts <<~SHELL
+        Helper.system_and_puts <<~SHELL
           mkdir -p #{PBM_DIR}/v#{version} &&
             cp procon_bypass_man-#{version}/project_template/app.rb #{PBM_DIR}/v#{version}/
             cp procon_bypass_man-#{version}/project_template/README.md #{PBM_DIR}/v#{version}/
@@ -94,7 +80,7 @@ module Pbmenv
 
     def create_if_miss_shared_dir
       unless File.exists?(VersionPathname.shared)
-        system_and_puts <<~SHELL
+        Helper.system_and_puts <<~SHELL
           mkdir -p #{VersionPathname.shared}
         SHELL
       end
@@ -109,7 +95,7 @@ module Pbmenv
 
     def link_device_id_file(version: )
       pathname = VersionPathname.new(version)
-      system_and_puts <<~SHELL
+      Helper.system_and_puts <<~SHELL
         ln -s #{pathname.device_id_in_shared} #{pathname.device_id_in_version}
       SHELL
     end
@@ -119,15 +105,6 @@ module Pbmenv
       if !File.exists?(VersionPathname.current) || use_option
         Pbmenv.use(version)
       end
-    end
-
-    def system_and_puts(shell)
-      to_stdout "[SHELL] #{shell}"
-      system(shell)
-    end
-
-    def to_stdout(text)
-      puts text
     end
   end
 end

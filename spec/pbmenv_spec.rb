@@ -10,7 +10,7 @@ describe Pbmenv do
   end
 
   before(:each) do
-    allow(Pbmenv).to receive(:to_stdout) if ENV["DISABLE_DEBUG_LOG"]
+    allow(Pbmenv::Helper).to receive(:to_stdout) if ENV["DISABLE_DEBUG_LOG"]
     purge_pbm_dir
   end
 
