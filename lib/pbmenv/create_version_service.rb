@@ -60,7 +60,6 @@ module Pbmenv
           enable_integration_with_pbm_cloud: enable_pbm_cloud,
         ).generate
         Helper.system_and_puts "rm #{pathname.app_rb_erb_path}"
-
       else
         Helper.system_and_puts <<~SHELL
           mkdir -p #{pathname.version_path} &&
