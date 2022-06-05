@@ -1,3 +1,6 @@
+## [0.1.10] - 2022-06-05
+- project_template/app.rb.erbを評価してapp.rbを生成するようになりました
+
 ## [0.1.9] - 2022-02-18
 - Pbmenv.installにenable_pbm_cloudオプションを追加しました
 - Pbmenv.installにuse_optionオプションを追加しました
