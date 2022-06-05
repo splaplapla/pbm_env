@@ -15,7 +15,10 @@ describe Pbmenv do
   end
 
   describe 'integration' do
-    subject { Pbmenv.install(target_version) && Pbmenv.use(target_version) }
+    subject do
+      Pbmenv.install(target_version)
+      Pbmenv.use(target_version)
+    end
 
     context '0.2.1を渡すとき' do
       let(:target_version) { "0.2.1" }
