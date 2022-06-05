@@ -10,7 +10,7 @@ module Pbmenv
     end
 
     def self.normalize_version(version)
-      version.match(/v?([\w.]+)/)[1]
+      /\Av?([\w.]*)\z/ =~ version && $1
     end
   end
 end

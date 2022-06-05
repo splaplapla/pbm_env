@@ -1,5 +1,7 @@
 module Pbmenv
   class DownloadSrcService
+    class DownloadError < StandardError; end
+
     attr_accessor :version
 
     def initialize(version)
@@ -18,10 +20,12 @@ module Pbmenv
         SHELL
       end
 
-      Helper.system_and_puts(shell)
-
-      unless File.exists?("procon_bypass_man-#{version}/project_template")
-        raise NotSupportVersionError, "This version is not support by pbmenv"
+      if Helper.system_and_puts(shell)
+        unless File.exists?("procon_bypass_man-#{version}/project_template")
+          raise NotSupportVersionError, "This version is not support by pbmenv"
+        end
+      else
+        raise DownloadError
       end
     end
   end

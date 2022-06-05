@@ -24,7 +24,7 @@ describe Pbmenv do
       let(:target_version) { "0.2.1" }
 
       it 'currentにシムリンクが貼っている' do
-        subject
+        expect(subject).to eq(true)
         latest_version = Pbmenv.available_versions.first
         version_path = "/usr/share/pbm/v#{latest_version}"
         expect(File.readlink("/usr/share/pbm/current")).to eq("/usr/share/pbm/v#{target_version}")
@@ -34,6 +34,14 @@ describe Pbmenv do
         expect(File.exists?("#{version_path}/setting.yml")).to eq(true)
         expect(Dir.exists?("/usr/share/pbm/shared")).to eq(true)
         expect(File.read("/usr/share/pbm/shared/device_id")).to be_a(String)
+      end
+    end
+
+    context '存在しないバージョンを渡すとき' do
+      let(:target_version) { "999.999.999" }
+
+      it do
+        expect(subject).to eq(false)
       end
     end
 

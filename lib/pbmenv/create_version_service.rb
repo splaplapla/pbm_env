@@ -25,14 +25,19 @@ module Pbmenv
         create_if_miss_device_id_file
         link_device_id_file(version: version)
         create_if_miss_current_dir(version: version)
+      rescue DownloadSrcService::DownloadError
+        puts "Download failed. Check the version name."
+        raise NotSupportVersionError
       rescue => e
         Helper.system_and_puts "rm -rf #{VersionPathname.new(version).version_path}"
         raise
       ensure
-        if Dir.exists?(source_path)
+        if source_path && Dir.exists?(source_path)
           Helper.system_and_puts "rm -rf #{source_path}"
         end
       end
+
+      return true
     end
 
     private

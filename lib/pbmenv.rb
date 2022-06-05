@@ -38,7 +38,7 @@ module Pbmenv
     rescue CreateVersionService::AlreadyCreatedError
       return false
     rescue CreateVersionService::NotSupportVersionError
-      raise
+      return false
     end
   end
 
