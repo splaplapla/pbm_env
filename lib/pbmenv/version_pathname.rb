@@ -11,23 +11,23 @@ module Pbmenv
     end
 
     def app_rb_path
-      File.join(PBM_DIR, "/v#{@version}", "app.rb")
+      File.join(version_path, "app.rb")
     end
 
     def app_rb_erb_path
-      File.join(PBM_DIR, "/v#{@version}", "app.rb.erb")
+      File.join(version_path, "app.rb.erb")
     end
 
     def device_id_path_in_version
-      File.join(PBM_DIR, "/v#{@version}", "/device_id")
+      File.join(version_path, "/device_id")
     end
 
     def device_id_path_in_shared
-      File.join(PBM_DIR, "/shared", "/device_id")
+      File.join(self.class.shared, "/device_id")
     end
 
     def self.device_id_path_in_shared
-      File.join(PBM_DIR, "/shared", "/device_id")
+      File.join(shared, "/device_id")
     end
 
     def self.current
