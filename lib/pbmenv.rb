@@ -9,6 +9,7 @@ require_relative "pbmenv/pbm"
 require_relative "pbmenv/helper"
 require_relative "pbmenv/version_pathname"
 require_relative "pbmenv/create_version_service"
+require_relative "pbmenv/destroy_version_service"
 require_relative "pbmenv/use_version_service"
 require_relative "pbmenv/download_src_service"
 
@@ -44,11 +45,13 @@ module Pbmenv
   # TODO currentが挿しているバージョンはどうする？
   def self.uninstall(version)
     raise "Need a version" if version.nil?
+    version = Helper.normalize_version(version) or raise "mismatch version number!"
 
-    unless File.exists?("/usr/share/pbm/v#{version}")
+    begin
+      DestroyVersionService.new(version: version).execute!
+    rescue DestroyVersionService::VersionNotFoundError
       return false
     end
-    Helper.system_and_puts "rm -rf #{PBM_DIR}/v#{version}"
   end
 
   def self.use(version)
