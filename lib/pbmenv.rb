@@ -24,6 +24,8 @@ module Pbmenv
       version = available_versions.first
     end
 
+    version = normalize_version(version)
+
     if File.exists?("/usr/share/pbm/v#{version}")
       return false
     end
@@ -112,7 +114,7 @@ module Pbmenv
       system_and_puts "unlink #{PBM_DIR}/current"
     end
 
-    if(version_number = version.match(/v?([\w.]+)/)[1])
+    if(version_number = normalize_version(version.match(/v?([\w.]+)/)[1]))
       system_and_puts "ln -s #{PBM_DIR}/v#{version_number} #{PBM_DIR}/current"
     else
       raise "mismatch version number!"
@@ -145,5 +147,9 @@ module Pbmenv
 
   def self.to_stdout(text)
     puts text
+  end
+
+  def self.normalize_version(version)
+    version.match(/v?([\w.]+)/)[1]
   end
 end
