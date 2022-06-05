@@ -14,19 +14,45 @@ describe Pbmenv do
     purge_pbm_dir
   end
 
-  describe '.use' do
-    context 'real donwload', :with_real_download do
-      context 'latestを渡すとき' do
-        subject { Pbmenv.install("0.2.1") && Pbmenv.use("0.2.1") }
+  describe 'integration' do
+    subject { Pbmenv.install(target_version) && Pbmenv.use(target_version) }
 
-        it 'currentにシムリンクが貼っている' do
-          subject
-          latest_version = Pbmenv.available_versions.first
-          expect(File.readlink("/usr/share/pbm/current")).to eq("/usr/share/pbm/v0.2.1")
-        end
+    context '0.2.1を渡すとき' do
+      let(:target_version) { "0.2.1" }
+
+      it 'currentにシムリンクが貼っている' do
+        subject
+        latest_version = Pbmenv.available_versions.first
+        version_path = "/usr/share/pbm/v#{latest_version}"
+        expect(File.readlink("/usr/share/pbm/current")).to eq("/usr/share/pbm/v#{target_version}")
+        expect(Dir.exists?(version_path)).to eq(true)
+        expect(File.exists?("#{version_path}/app.rb")).to eq(true)
+        expect(File.exists?("#{version_path}/README.md")).to eq(true)
+        expect(File.exists?("#{version_path}/setting.yml")).to eq(true)
+        expect(Dir.exists?("/usr/share/pbm/shared")).to eq(true)
+        expect(File.read("/usr/share/pbm/shared/device_id")).to be_a(String)
       end
     end
 
+    context 'latestを渡すとき' do
+      let(:target_version) { "latest" }
+
+      it 'currentにシムリンクが貼っている' do
+        subject
+        latest_version = Pbmenv.available_versions.first
+        version_path = "/usr/share/pbm/v#{latest_version}"
+        expect(File.readlink("/usr/share/pbm/current")).to match(%r!/usr/share/pbm/v[\d.]+!)
+        expect(Dir.exists?(version_path)).to eq(true)
+        expect(File.exists?("#{version_path}/app.rb")).to eq(true)
+        expect(File.exists?("#{version_path}/README.md")).to eq(true)
+        expect(File.exists?("#{version_path}/setting.yml")).to eq(true)
+        expect(Dir.exists?("/usr/share/pbm/shared")).to eq(true)
+        expect(File.read("/usr/share/pbm/shared/device_id")).to be_a(String)
+      end
+    end
+  end
+
+  describe '.use' do
     context 'すでにインストール済みのとき', :with_decompress_procon_pbm_man do
       let(:decompress_procon_pbm_man_versions) { ["0.1.5", "0.1.6"] }
 
@@ -112,22 +138,20 @@ describe Pbmenv do
 
     context '0.1.6をインストールするとき', :with_decompress_procon_pbm_man do
       let(:decompress_procon_pbm_man_versions) { ["0.1.6"] }
+      let(:target_version) { decompress_procon_pbm_man_versions.first }
 
-      subject { Pbmenv.install("0.1.6") }
+      subject { Pbmenv.install(target_version) }
 
-      it_behaves_like "correct_pbm_dir_spec" do
-        let(:target_version) { "0.1.6" }
-      end
+      it_behaves_like "correct_pbm_dir_spec"
     end
 
     context '0.1.20.1をインストールするとき', :with_decompress_procon_pbm_man do
       let(:decompress_procon_pbm_man_versions) { ["0.1.20.1"] }
+      let(:target_version) { decompress_procon_pbm_man_versions.first }
 
-      subject { Pbmenv.install("0.1.20.1", enable_pbm_cloud: true) }
+      subject { Pbmenv.install(target_version, enable_pbm_cloud: true) }
 
-      it_behaves_like "correct_pbm_dir_spec" do
-        let(:target_version) { "0.1.20.1" }
-      end
+      include_examples "correct_pbm_dir_spec"
 
       it "URLの行がアンコメントアウトされていること" do
         subject
@@ -167,20 +191,6 @@ describe Pbmenv do
           # 特定行をコメントアウトしていること
           expect(File.read("#{a_pbm_path}/app.rb")).to match(%r!^  # config.api_servers = \['https://pbm-cloud.herokuapp.com'\]$!)
         end
-      end
-    end
-
-    describe 'provide "latest"' do
-      it 'latest versionをインストールすること' do
-        Pbmenv.install("latest")
-        latest_version = Pbmenv.available_versions.first
-        version_path = "/usr/share/pbm/v#{latest_version}"
-        expect(Dir.exists?(version_path)).to eq(true)
-        expect(File.exists?("#{version_path}/app.rb")).to eq(true)
-        expect(File.exists?("#{version_path}/README.md")).to eq(true)
-        expect(File.exists?("#{version_path}/setting.yml")).to eq(true)
-        expect(Dir.exists?("/usr/share/pbm/shared")).to eq(true)
-        expect(File.read("/usr/share/pbm/shared/device_id")).to be_a(String)
       end
     end
   end
