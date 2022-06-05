@@ -89,8 +89,8 @@ describe Pbmenv do
       include_examples "correct_pbm_dir_spec"
     end
 
-      context '0.1.6, 0.1.5の順番でインストールするとき', :with_decompress_procon_pbm_man do
-        let(:decompress_procon_pbm_man_versions) { ["0.1.6", "0.1.5", "0.1.20.1"] }
+    context '0.1.6, 0.1.5の順番でインストールするとき', :with_decompress_procon_pbm_man do
+      let(:decompress_procon_pbm_man_versions) { ["0.1.6", "0.1.5", "0.1.20.1"] }
 
       subject do
         Pbmenv.install("0.1.6")
@@ -112,64 +112,64 @@ describe Pbmenv do
           expect(File.readlink("/usr/share/pbm/current")).to eq("/usr/share/pbm/v0.1.20.1")
         end
       end
+    end
 
-      context '0.1.6をインストールするとき', :with_decompress_procon_pbm_man do
-        let(:decompress_procon_pbm_man_versions) { ["0.1.6"] }
+    context '0.1.6をインストールするとき', :with_decompress_procon_pbm_man do
+      let(:decompress_procon_pbm_man_versions) { ["0.1.6"] }
 
-        subject { Pbmenv.install("0.1.6") }
+      subject { Pbmenv.install("0.1.6") }
 
-        it_behaves_like "correct_pbm_dir_spec" do
-          let(:target_version) { "0.1.6" }
-        end
+      it_behaves_like "correct_pbm_dir_spec" do
+        let(:target_version) { "0.1.6" }
+      end
+    end
+
+    context '0.1.20.1をインストールするとき', :with_decompress_procon_pbm_man do
+      let(:decompress_procon_pbm_man_versions) { ["0.1.20.1"] }
+
+      subject { Pbmenv.install("0.1.20.1", enable_pbm_cloud: true) }
+
+      it_behaves_like "correct_pbm_dir_spec" do
+        let(:target_version) { "0.1.20.1" }
       end
 
-      context '0.1.20.1をインストールするとき', :with_decompress_procon_pbm_man do
-        let(:decompress_procon_pbm_man_versions) { ["0.1.20.1"] }
+      it "URLの行がアンコメントアウトされていること" do
+        subject
+        target_version = decompress_procon_pbm_man_versions.first
+        a_pbm_path = "/usr/share/pbm/v#{target_version}"
+        expect(File.read("#{a_pbm_path}/app.rb")).to match(%r!^  config.api_servers = 'https://pbm-cloud.herokuapp.com'$!)
+      end
+    end
 
-        subject { Pbmenv.install("0.1.20.1", enable_pbm_cloud: true) }
+    context '0.2.2をインストールするとき', :with_decompress_procon_pbm_man do
+      let(:decompress_procon_pbm_man_versions) { ["0.2.2"] }
+      let(:target_version) { decompress_procon_pbm_man_versions.first }
 
-        it_behaves_like "correct_pbm_dir_spec" do
-          let(:target_version) { "0.1.20.1" }
-        end
+      context 'enable_pbm_cloud: true' do
+        subject { Pbmenv.install(target_version, enable_pbm_cloud: true) }
+
+        include_examples "correct_pbm_dir_spec"
 
         it "URLの行がアンコメントアウトされていること" do
           subject
-          target_version = decompress_procon_pbm_man_versions.first
           a_pbm_path = "/usr/share/pbm/v#{target_version}"
-          expect(File.read("#{a_pbm_path}/app.rb")).to match(%r!^  config.api_servers = 'https://pbm-cloud.herokuapp.com'$!)
+          expect(File.exists?("#{a_pbm_path}/app.rb.erb")).to eq(false)
+          # 特定行をアンコメントしていること
+          expect(File.read("#{a_pbm_path}/app.rb")).to match(%r!^  config.api_servers = \['https://pbm-cloud.herokuapp.com'\]$!)
         end
       end
 
-      context '0.2.2をインストールするとき', :with_decompress_procon_pbm_man do
-        let(:decompress_procon_pbm_man_versions) { ["0.2.2"] }
-        let(:target_version) { decompress_procon_pbm_man_versions.first }
+      context 'enable_pbm_cloud: false' do
+        subject { Pbmenv.install(target_version, enable_pbm_cloud: false) }
 
-        context 'enable_pbm_cloud: true' do
-          subject { Pbmenv.install(target_version, enable_pbm_cloud: true) }
+        include_examples "correct_pbm_dir_spec"
 
-          include_examples "correct_pbm_dir_spec"
-
-          it "URLの行がアンコメントアウトされていること" do
-            subject
-            a_pbm_path = "/usr/share/pbm/v#{target_version}"
-            expect(File.exists?("#{a_pbm_path}/app.rb.erb")).to eq(false)
-            # 特定行をアンコメントしていること
-            expect(File.read("#{a_pbm_path}/app.rb")).to match(%r!^  config.api_servers = \['https://pbm-cloud.herokuapp.com'\]$!)
-          end
-        end
-
-        context 'enable_pbm_cloud: false' do
-          subject { Pbmenv.install(target_version, enable_pbm_cloud: false) }
-
-          include_examples "correct_pbm_dir_spec"
-
-          it "URLの行がコメントアウトされていること" do
-            subject
-            a_pbm_path = "/usr/share/pbm/v#{target_version}"
-            expect(File.exists?("#{a_pbm_path}/app.rb.erb")).to eq(false)
-            # 特定行をコメントアウトしていること
-            expect(File.read("#{a_pbm_path}/app.rb")).to match(%r!^  # config.api_servers = \['https://pbm-cloud.herokuapp.com'\]$!)
-          end
+        it "URLの行がコメントアウトされていること" do
+          subject
+          a_pbm_path = "/usr/share/pbm/v#{target_version}"
+          expect(File.exists?("#{a_pbm_path}/app.rb.erb")).to eq(false)
+          # 特定行をコメントアウトしていること
+          expect(File.read("#{a_pbm_path}/app.rb")).to match(%r!^  # config.api_servers = \['https://pbm-cloud.herokuapp.com'\]$!)
         end
       end
     end
