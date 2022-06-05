@@ -15,7 +15,7 @@ describe Pbmenv do
   end
 
   describe '.use' do
-    context 'read donwload', :with_real_download do
+    context 'real donwload', :with_real_download do
       context 'latestを渡すとき' do
         subject { Pbmenv.install("0.2.1") && Pbmenv.use("0.2.1") }
 
@@ -33,10 +33,6 @@ describe Pbmenv do
       before(:each) do
         Pbmenv.install("0.1.5")
         Pbmenv.install("0.1.6")
-      end
-      after(:each) do
-        Pbmenv.uninstall("0.1.5")
-        Pbmenv.uninstall("0.1.6")
       end
 
       context 'バージョンを渡すとき' do
