@@ -10,6 +10,10 @@ module Pbmenv
       File.join(PBM_DIR, "/v#{@version}")
     end
 
+    def version_path_without_v
+      File.join(PBM_DIR, "/#{@version}")
+    end
+
     def app_rb_path
       File.join(version_path, "app.rb")
     end

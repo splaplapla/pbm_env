@@ -9,6 +9,7 @@ require_relative "pbmenv/pbm"
 require_relative "pbmenv/helper"
 require_relative "pbmenv/version_pathname"
 require_relative "pbmenv/create_version_service"
+require_relative "pbmenv/use_version_service"
 require_relative "pbmenv/download_src_service"
 
 module Pbmenv
@@ -28,7 +29,7 @@ module Pbmenv
       if version == 'latest'
         available_versions.first
       else
-        normalize_version(version)
+        Helper.normalize_version(version) or raise "mismatch version number!"
       end
 
     begin
@@ -52,24 +53,17 @@ module Pbmenv
 
   def self.use(version)
     raise "Need a version" if version.nil?
-    version = versions.last if version == "latest"
+    version =
+      if version == 'latest'
+        versions.last
+      else
+        Helper.normalize_version(version) or raise "mismatch version number!"
+      end
 
-    if !File.exists?("/usr/share/pbm/#{version}") && !File.exists?("/usr/share/pbm/v#{version}")
+    begin
+      UseVersionService.new(version: version).execute!
+    rescue UseVersionService::VersionNotFoundError
       return false
     end
-
-    if File.symlink?("#{PBM_DIR}/current")
-      Helper.system_and_puts "unlink #{PBM_DIR}/current"
-    end
-
-    if(version_number = normalize_version(version))
-      Helper.system_and_puts "ln -s #{PBM_DIR}/v#{version_number} #{PBM_DIR}/current"
-    else
-      raise "mismatch version number!"
-    end
-  end
-
-  def self.normalize_version(version)
-    version.match(/v?([\w.]+)/)[1]
   end
 end

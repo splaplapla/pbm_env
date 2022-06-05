@@ -106,7 +106,7 @@ module Pbmenv
     def create_if_miss_current_dir(version: )
       # 初回だけinstall時にcurrentを作成する
       if !File.exists?(VersionPathname.current) || use_option
-        Pbmenv.use(version)
+        UseVersionService.new(version: version).execute!
       end
     end
   end
