@@ -26,7 +26,7 @@ module Pbmenv
         link_device_id_file(version: version)
         create_if_miss_current_dir(version: version)
       rescue => e
-        Helper.system_and_puts "rm -rf #{PBM_DIR}/v#{version}"
+        Helper.system_and_puts "rm -rf #{VersionPathname.new(version).version_path}"
         raise
       ensure
         if Dir.exists?(source_path)
@@ -44,37 +44,40 @@ module Pbmenv
     end
 
     def build_app_file(source_path: )
-      if File.exists?(File.join("procon_bypass_man-#{version}/", "project_template/app.rb.erb"))
+      pathname = VersionPathname.new(version)
+
+      if File.exists?(File.join(source_path, "project_template/app.rb.erb"))
         Helper.system_and_puts <<~SHELL
-          mkdir -p #{PBM_DIR}/v#{version} &&
-            cp procon_bypass_man-#{version}/project_template/app.rb.erb #{PBM_DIR}/v#{version}/
-            cp procon_bypass_man-#{version}/project_template/README.md #{PBM_DIR}/v#{version}/
-            cp procon_bypass_man-#{version}/project_template/setting.yml #{PBM_DIR}/v#{version}/
-            cp -r procon_bypass_man-#{version}/project_template/systemd_units #{PBM_DIR}/v#{version}/
+          mkdir -p #{pathname.version_path} &&
+            cp procon_bypass_man-#{version}/project_template/app.rb.erb #{pathname.version_path}/
+            cp procon_bypass_man-#{version}/project_template/README.md #{pathname.version_path}/
+            cp procon_bypass_man-#{version}/project_template/setting.yml #{pathname.version_path}/
+            cp -r procon_bypass_man-#{version}/project_template/systemd_units #{pathname.version_path}/
         SHELL
         require "./procon_bypass_man-#{version}/project_template/lib/app_generator"
         AppGenerator.new(
-          prefix_path: "#{PBM_DIR}/v#{version}/",
+          prefix_path: pathname.version_path,
           enable_integration_with_pbm_cloud: enable_pbm_cloud,
         ).generate
-        Helper.system_and_puts "rm #{PBM_DIR}/v#{version}/app.rb.erb"
+        Helper.system_and_puts "rm #{pathname.app_rb_erb_path}"
+
       else
         Helper.system_and_puts <<~SHELL
-          mkdir -p #{PBM_DIR}/v#{version} &&
-            cp procon_bypass_man-#{version}/project_template/app.rb #{PBM_DIR}/v#{version}/
-            cp procon_bypass_man-#{version}/project_template/README.md #{PBM_DIR}/v#{version}/
-            cp procon_bypass_man-#{version}/project_template/setting.yml #{PBM_DIR}/v#{version}/
-            cp -r procon_bypass_man-#{version}/project_template/systemd_units #{PBM_DIR}/v#{version}/
+          mkdir -p #{pathname.version_path} &&
+            cp procon_bypass_man-#{version}/project_template/app.rb #{pathname.version_path}/
+            cp procon_bypass_man-#{version}/project_template/README.md #{pathname.version_path}/
+            cp procon_bypass_man-#{version}/project_template/setting.yml #{pathname.version_path}/
+            cp -r procon_bypass_man-#{version}/project_template/systemd_units #{pathname.version_path}/
         SHELL
       end
 
       # 旧実装バージョン
       if enable_pbm_cloud
-        text = File.read("#{PBM_DIR}/v#{version}/app.rb")
+        text = File.read(pathname.app_rb_path)
         if text =~ /config\.api_servers\s+=\s+\['(https:\/\/.+)'\]/ && (url = $1)
           text.gsub!(/#\s+config\.api_servers\s+=\s+.+$/, "config.api_servers = '#{url}'")
         end
-        File.write("#{PBM_DIR}/v#{version}/app.rb", text)
+        File.write(pathname.app_rb_path, text)
       end
     end
 
@@ -87,7 +90,7 @@ module Pbmenv
     end
 
     def create_if_miss_device_id_file
-      device_id_path_in_shared = VersionPathname.device_id_in_shared
+      device_id_path_in_shared = VersionPathname.device_id_path_in_shared
       unless File.exists?(device_id_path_in_shared)
         File.write(device_id_path_in_shared, "d_#{SecureRandom.uuid}")
       end
@@ -96,7 +99,7 @@ module Pbmenv
     def link_device_id_file(version: )
       pathname = VersionPathname.new(version)
       Helper.system_and_puts <<~SHELL
-        ln -s #{pathname.device_id_in_shared} #{pathname.device_id_in_version}
+        ln -s #{pathname.device_id_path_in_shared} #{pathname.device_id_path_in_version}
       SHELL
     end
 
