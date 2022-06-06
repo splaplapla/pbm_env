@@ -51,28 +51,24 @@ module Pbmenv
     def build_app_file(source_path: )
       pathname = VersionPathname.new(version)
 
-      if File.exists?(File.join(source_path, "project_template/app.rb.erb"))
-        Helper.system_and_puts <<~SHELL
-          mkdir -p #{pathname.version_path} &&
-            cp procon_bypass_man-#{version}/project_template/app.rb.erb #{pathname.version_path}/
-            cp procon_bypass_man-#{version}/project_template/README.md #{pathname.version_path}/
-            cp procon_bypass_man-#{version}/project_template/setting.yml #{pathname.version_path}/
-            cp -r procon_bypass_man-#{version}/project_template/systemd_units #{pathname.version_path}/
-        SHELL
-        require "./procon_bypass_man-#{version}/project_template/lib/app_generator"
+      if File.exists?(pathname.src_pbm_project_template_app_rb_erb_path)
+        Helper.system_and_puts "mkdir -p #{pathname.version_path}"
+        pathname.project_template_file_paths(include_app_erb: true).each do |project_template_file_path|
+          Helper.system_and_puts "cp #{project_template_file_path} #{pathname.version_path}/"
+        end
+        Helper.system_and_puts "cp -r procon_bypass_man-#{version}/project_template/systemd_units #{pathname.version_path}/"
+        require "/tmp/procon_bypass_man-#{version}/project_template/lib/app_generator"
         AppGenerator.new(
           prefix_path: pathname.version_path,
           enable_integration_with_pbm_cloud: enable_pbm_cloud,
         ).generate
         Helper.system_and_puts "rm #{pathname.app_rb_erb_path}"
       else
-        Helper.system_and_puts <<~SHELL
-          mkdir -p #{pathname.version_path} &&
-            cp procon_bypass_man-#{version}/project_template/app.rb #{pathname.version_path}/
-            cp procon_bypass_man-#{version}/project_template/README.md #{pathname.version_path}/
-            cp procon_bypass_man-#{version}/project_template/setting.yml #{pathname.version_path}/
-            cp -r procon_bypass_man-#{version}/project_template/systemd_units #{pathname.version_path}/
-        SHELL
+        Helper.system_and_puts "mkdir -p #{pathname.version_path}"
+        pathname.project_template_file_paths(include_app_erb: false).each do |project_template_file_path|
+          Helper.system_and_puts "cp #{project_template_file_path} #{pathname.version_path}/"
+        end
+        Helper.system_and_puts "cp -r procon_bypass_man-#{version}/project_template/systemd_units #{pathname.version_path}/"
       end
 
       # 旧実装バージョン

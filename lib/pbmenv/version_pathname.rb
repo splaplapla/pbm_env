@@ -27,11 +27,25 @@ module Pbmenv
     end
 
     def src_pbm_path
-      File.join("/tmp", "procon_bypass_man-#{version}")
+      File.join("/tmp", "procon_bypass_man-#{@version}")
+    end
+
+    def project_template_file_paths(include_app_erb: )
+      paths = ["README.md", "setting.yml"]
+      if include_app_erb
+        paths << "app.rb.erb"
+      else
+        paths << "app.rb"
+      end
+      return paths.map { |path| File.join(src_pbm_project_template_path, path) }
     end
 
     def src_pbm_project_template_path
       File.join(src_pbm_path, "project_template")
+    end
+
+    def src_pbm_project_template_app_rb_erb_path
+      File.join(src_pbm_project_template_path, "app.rb.erb")
     end
 
     def device_id_path_in_shared
