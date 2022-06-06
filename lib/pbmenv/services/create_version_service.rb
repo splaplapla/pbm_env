@@ -45,7 +45,7 @@ module Pbmenv
     # @return [String]
     def download_src(version)
       Pbmenv::DownloadSrcService.new(version).execute!
-      return "procon_bypass_man-#{version}"
+      return VersionPathname.new(version).src_pbm_path
     end
 
     def build_app_file(source_path: )

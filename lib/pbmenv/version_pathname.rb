@@ -26,6 +26,14 @@ module Pbmenv
       File.join(version_path, "/device_id")
     end
 
+    def src_pbm_path
+      File.join("/tmp", "procon_bypass_man-#{version}")
+    end
+
+    def src_pbm_project_template_path
+      File.join(src_pbm_path, "project_template")
+    end
+
     def device_id_path_in_shared
       File.join(self.class.shared, "/device_id")
     end
