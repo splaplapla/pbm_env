@@ -82,18 +82,18 @@ module Pbmenv
     end
 
     def create_if_miss_shared_dir
-      unless File.exists?(VersionPathname.shared)
-        Helper.system_and_puts <<~SHELL
+      return if File.exists?(VersionPathname.shared)
+
+      Helper.system_and_puts <<~SHELL
           mkdir -p #{VersionPathname.shared}
-        SHELL
-      end
+      SHELL
     end
 
     def create_if_miss_device_id_file
       device_id_path_in_shared = VersionPathname.device_id_path_in_shared
-      unless File.exists?(device_id_path_in_shared)
-        File.write(device_id_path_in_shared, "d_#{SecureRandom.uuid}")
-      end
+      return if File.exists?(device_id_path_in_shared)
+
+      File.write(device_id_path_in_shared, "d_#{SecureRandom.uuid}")
     end
 
     def link_device_id_file(version: )
