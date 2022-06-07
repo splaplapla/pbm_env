@@ -14,13 +14,14 @@ module Pbmenv
     end
 
     def execute!
-      if File.exists?("/usr/share/pbm/v#{version}")
+      pathname = VersionPathname.new(version)
+      if File.exists?(pathname.version_path)
         raise AlreadyCreatedError
       end
 
       begin
-        source_path = download_src(version)
-        build_app_file(source_path: source_path)
+        download_src(version)
+        build_app_file
         create_if_miss_shared_dir
         create_if_miss_device_id_file
         link_device_id_file(version: version)
@@ -29,11 +30,11 @@ module Pbmenv
         puts "Download failed. Check the version name."
         raise NotSupportVersionError
       rescue => e
-        Helper.system_and_puts "rm -rf #{VersionPathname.new(version).version_path}"
+        Helper.system_and_puts "rm -rf #{pathname.version_path}"
         raise
       ensure
-        if source_path && Dir.exists?(source_path)
-          Helper.system_and_puts "rm -rf #{source_path}"
+        if Dir.exists?(pathname.src_pbm_path)
+          Helper.system_and_puts "rm -rf #{pathname.src_pbm_path}"
         end
       end
 
@@ -45,10 +46,9 @@ module Pbmenv
     # @return [String]
     def download_src(version)
       Pbmenv::DownloadSrcService.new(version).execute!
-      return VersionPathname.new(version).src_pbm_path
     end
 
-    def build_app_file(source_path: )
+    def build_app_file
       pathname = VersionPathname.new(version)
 
       if File.exists?(pathname.src_pbm_project_template_app_rb_erb_path)
@@ -71,7 +71,7 @@ module Pbmenv
         Helper.system_and_puts "cp -r /tmp/procon_bypass_man-#{version}/project_template/systemd_units #{pathname.version_path}/"
       end
 
-      # 旧実装バージョン
+      # 旧実装バージョン. 0.2.10くらいで削除する
       if enable_pbm_cloud
         text = File.read(pathname.app_rb_path)
         if text =~ /config\.api_servers\s+=\s+\['(https:\/\/.+)'\]/ && (url = $1)
