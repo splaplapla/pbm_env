@@ -56,7 +56,7 @@ module Pbmenv
         pathname.project_template_file_paths(include_app_erb: true).each do |project_template_file_path|
           Helper.system_and_puts "cp #{project_template_file_path} #{pathname.version_path}/"
         end
-        Helper.system_and_puts "cp -r procon_bypass_man-#{version}/project_template/systemd_units #{pathname.version_path}/"
+        Helper.system_and_puts "cp -r /tmp/procon_bypass_man-#{version}/project_template/systemd_units #{pathname.version_path}/"
         require "/tmp/procon_bypass_man-#{version}/project_template/lib/app_generator"
         AppGenerator.new(
           prefix_path: pathname.version_path,
@@ -68,7 +68,7 @@ module Pbmenv
         pathname.project_template_file_paths(include_app_erb: false).each do |project_template_file_path|
           Helper.system_and_puts "cp #{project_template_file_path} #{pathname.version_path}/"
         end
-        Helper.system_and_puts "cp -r procon_bypass_man-#{version}/project_template/systemd_units #{pathname.version_path}/"
+        Helper.system_and_puts "cp -r /tmp/procon_bypass_man-#{version}/project_template/systemd_units #{pathname.version_path}/"
       end
 
       # 旧実装バージョン
