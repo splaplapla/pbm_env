@@ -1,7 +1,5 @@
 module Pbmenv
   class VersionPathname
-    PBM_DIR = "/usr/share/pbm"
-
     attr_accessor :version
 
     def initialize(version)
@@ -9,11 +7,11 @@ module Pbmenv
     end
 
     def version_path
-      File.join(PBM_DIR, "/v#{version}")
+      File.join(PBM_DIR, "v#{version}")
     end
 
     def version_path_without_v
-      File.join(PBM_DIR, "/#{version}")
+      File.join(PBM_DIR, "#{version}")
     end
 
     def app_rb_path
@@ -25,7 +23,7 @@ module Pbmenv
     end
 
     def device_id_path_in_version
-      File.join(version_path, "/device_id")
+      File.join(version_path, "device_id")
     end
 
     def src_pbm_path
@@ -42,6 +40,10 @@ module Pbmenv
       return paths.map { |path| File.join(src_pbm_project_template_path, path) }
     end
 
+    def device_id_path_in_shared
+      File.join(self.class.shared, "device_id")
+    end
+
     def src_pbm_project_template_path
       File.join(src_pbm_path, "project_template")
     end
@@ -50,28 +52,24 @@ module Pbmenv
       File.join(src_pbm_project_template_path, "app.rb.erb")
     end
 
-    def device_id_path_in_shared
-      File.join(self.class.shared, "/device_id")
-    end
-
     def lib_app_generator
-      File.join(src_pbm_path, "project_template", "lib", "app_generator")
+      File.join(src_pbm_project_template_path, "lib", "app_generator")
     end
 
     def src_project_template_systemd_units
-      File.join(src_pbm_path, "project_template", "systemd_units")
+      File.join(src_pbm_project_template_path, "systemd_units")
     end
 
     def self.device_id_path_in_shared
-      File.join(shared, "/device_id")
+      File.join(shared, "device_id")
     end
 
     def self.current
-      File.join(PBM_DIR, "/current")
+      File.join(PBM_DIR, "current")
     end
 
     def self.shared
-      File.join(PBM_DIR, "/shared")
+      File.join(PBM_DIR, "shared")
     end
   end
 end
