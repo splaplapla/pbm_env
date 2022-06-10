@@ -2,16 +2,18 @@ module Pbmenv
   class VersionPathname
     PBM_DIR = "/usr/share/pbm"
 
+    attr_accessor :version
+
     def initialize(version)
-      @version = version
+      self.version = version
     end
 
     def version_path
-      File.join(PBM_DIR, "/v#{@version}")
+      File.join(PBM_DIR, "/v#{version}")
     end
 
     def version_path_without_v
-      File.join(PBM_DIR, "/#{@version}")
+      File.join(PBM_DIR, "/#{version}")
     end
 
     def app_rb_path
@@ -27,7 +29,7 @@ module Pbmenv
     end
 
     def src_pbm_path
-      File.join("/tmp", "procon_bypass_man-#{@version}")
+      File.join("/tmp", "procon_bypass_man-#{version}")
     end
 
     def project_template_file_paths(include_app_erb: )
@@ -50,6 +52,14 @@ module Pbmenv
 
     def device_id_path_in_shared
       File.join(self.class.shared, "/device_id")
+    end
+
+    def lib_app_generator
+      File.join(src_pbm_path, "project_template", "lib", "app_generator")
+    end
+
+    def src_project_template_systemd_units
+      File.join(src_pbm_path, "project_template", "systemd_units")
     end
 
     def self.device_id_path_in_shared

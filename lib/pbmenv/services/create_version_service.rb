@@ -50,34 +50,32 @@ module Pbmenv
 
     def build_app_file
       pathname = VersionPathname.new(version)
+      Helper.system_and_puts "mkdir -p #{pathname.version_path}"
+      Helper.system_and_puts "cp -r #{pathname.src_project_template_systemd_units} #{pathname.version_path}/"
 
       if File.exists?(pathname.src_pbm_project_template_app_rb_erb_path)
-        Helper.system_and_puts "mkdir -p #{pathname.version_path}"
         pathname.project_template_file_paths(include_app_erb: true).each do |project_template_file_path|
           Helper.system_and_puts "cp #{project_template_file_path} #{pathname.version_path}/"
         end
-        Helper.system_and_puts "cp -r /tmp/procon_bypass_man-#{version}/project_template/systemd_units #{pathname.version_path}/"
-        require "/tmp/procon_bypass_man-#{version}/project_template/lib/app_generator"
+        require pathname.lib_app_generator
         AppGenerator.new(
           prefix_path: pathname.version_path,
           enable_integration_with_pbm_cloud: enable_pbm_cloud,
         ).generate
         Helper.system_and_puts "rm #{pathname.app_rb_erb_path}"
       else
-        Helper.system_and_puts "mkdir -p #{pathname.version_path}"
         pathname.project_template_file_paths(include_app_erb: false).each do |project_template_file_path|
           Helper.system_and_puts "cp #{project_template_file_path} #{pathname.version_path}/"
         end
-        Helper.system_and_puts "cp -r /tmp/procon_bypass_man-#{version}/project_template/systemd_units #{pathname.version_path}/"
-      end
 
-      # 旧実装バージョン. 0.2.10くらいで削除する
-      if enable_pbm_cloud
-        text = File.read(pathname.app_rb_path)
-        if text =~ /config\.api_servers\s+=\s+\['(https:\/\/.+)'\]/ && (url = $1)
-          text.gsub!(/#\s+config\.api_servers\s+=\s+.+$/, "config.api_servers = '#{url}'")
+        # 旧実装バージョン. 0.2.10くらいで削除する
+        if enable_pbm_cloud
+          text = File.read(pathname.app_rb_path)
+          if text =~ /config\.api_servers\s+=\s+\['(https:\/\/.+)'\]/ && (url = $1)
+            text.gsub!(/#\s+config\.api_servers\s+=\s+.+$/, "config.api_servers = '#{url}'")
+          end
+          File.write(pathname.app_rb_path, text)
         end
-        File.write(pathname.app_rb_path, text)
       end
     end
 
