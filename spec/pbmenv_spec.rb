@@ -25,7 +25,7 @@ describe Pbmenv do
 
       it 'currentにシムリンクが貼っている' do
         expect(subject).to eq(true)
-        latest_version = Pbmenv.available_versions.first
+        latest_version = Pbmenv.available_versions.detect { |x| x == target_version }
         version_path = "/usr/share/pbm/v#{latest_version}"
         expect(File.readlink("/usr/share/pbm/current")).to eq("/usr/share/pbm/v#{target_version}")
         expect(Dir.exists?(version_path)).to eq(true)
