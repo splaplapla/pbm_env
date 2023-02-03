@@ -14,6 +14,11 @@ module Pbmenv
       @version_name
     end
 
+    # alias
+    def name
+      version_name
+    end
+
     # @return [Boolean]
     def current_version?
       @is_current

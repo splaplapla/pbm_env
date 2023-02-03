@@ -35,7 +35,7 @@ module Pbmenv
       VersionObject.new(
         version_name: version_name,
         is_latest: sorted_version_names.last == version_name,
-        is_current: Pbmenv.current_directory.readlink&.end_with?(version_name),
+        is_current: Pbmenv.current_directory.readlink&.end_with?(version_name) || false,
       )
     end
   end
@@ -64,7 +64,7 @@ module Pbmenv
     end
   end
 
-  # TODO currentが挿しているバージョンはどうする？
+  # TODO: 引数がcurrentを指しているバージョンはどうする？
   def self.uninstall(version)
     raise "Need a version" if version.nil?
     version = Helper.normalize_version(version) or raise "mismatch version number!"
@@ -80,7 +80,7 @@ module Pbmenv
     raise "Need a version" if version.nil?
     version =
       if version == 'latest'
-        versions.last
+        self.versions.last
       else
         Helper.normalize_version(version) or raise "mismatch version number!"
       end
@@ -89,6 +89,20 @@ module Pbmenv
       UseVersionService.new(version: version).execute!
     rescue UseVersionService::VersionNotFoundError
       return false
+    end
+  end
+
+  # @param [Integer] keep_versions_size
+  # @return [void]
+  def self.clean(keep_versions_size)
+    raise ArgumentError if keep_versions_size.nil?
+
+    clean_targets = self.installed_versions[(keep_versions_size + 1)..-1]
+    return if clean_targets.nil?
+
+    clean_targets.each do |version_object|
+      next if(version_object.latest_version? or version_object.current_version?)
+      self.uninstall(version_object.name)
     end
   end
 end

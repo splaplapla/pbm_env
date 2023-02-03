@@ -27,12 +27,18 @@ module Pbmenv
       when 'uninstall'
         sub_command_arg = argv[1]
         Pbmenv.uninstall(sub_command_arg)
+      when 'clean'
+        version_size_to_keep = argv[1].to_i
+        if version_size_to_keep == 0
+          version_size_to_keep = 10
+        end
+        Pbmenv.clean(version_size_to_keep)
       when '--version'
         puts Pbmenv::VERSION
       else
         puts <<~EOH
           Unknown command:
-            available commands: available_versions, versions, install, use, uninstall
+            available commands: available_versions, versions, install, use, uninstall, clean
         EOH
       end
     end
