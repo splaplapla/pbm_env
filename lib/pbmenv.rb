@@ -20,7 +20,7 @@ module Pbmenv
 
   # @return [Pbmenv::DirectoryObject]
   def self.current_directory
-    Pbmenv::DirectoryObject.new(path: File.join(PBM_DIR, 'current'))
+    Pbmenv::DirectoryObject.new(path: VersionPathname.current)
   end
 
   def self.available_versions
