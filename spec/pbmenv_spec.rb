@@ -326,7 +326,7 @@ describe Pbmenv do
         subject
         actual = Pbmenv.installed_versions
         expect(actual.size).to eq(7)
-        expect(actual).to eq(
+        expect(actual.map(&:name)).to eq(
           ["0.0.1", "0.2.2", "0.2.3", "0.2.4", "0.2.5", "0.2.6", "0.10.1"]
         )
       end
