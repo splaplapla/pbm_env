@@ -6,10 +6,4 @@ describe Pbmenv::PBM do
       expect(described_class.new.available_versions).to be_a(Array)
     end
   end
-
-  describe "#versions" do
-    it do
-      expect(described_class.new.versions).to be_a(Array)
-    end
-  end
 end

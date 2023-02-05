@@ -14,6 +14,74 @@ describe Pbmenv do
     purge_pbm_dir
   end
 
+  describe '.installed_versions' do
+    subject { described_class.installed_versions }
+
+    context 'バージョンがないとき' do
+      it do
+        expect(subject).to eq([])
+      end
+    end
+
+    context 'バージョンが1個だけあるとき' do
+      context 'currentディレクトリがない' do
+        before do
+          FakeVersionDirFactory.create('0.1.0')
+        end
+
+        it do
+          expect(subject.size).to eq(1)
+          version_object = subject.last
+          expect(version_object).to have_attributes(latest_version?: true, current_version?: nil, version_name: '0.1.0')
+        end
+      end
+
+      context 'currentディレクトリがある' do
+        before do
+          FakeVersionDirFactory.create('0.1.0', symlink_to_current: true)
+        end
+
+        it do
+          expect(subject.size).to eq(1)
+          version_object = subject.last
+          expect(version_object).to have_attributes(latest_version?: true, current_version?: true, version_name: '0.1.0')
+        end
+      end
+    end
+
+    context 'バージョンがn個あるとき' do
+      context 'currentディレクトリがない' do
+        before do
+          FakeVersionDirFactory.create('0.1.0')
+          FakeVersionDirFactory.create('0.2.0')
+          FakeVersionDirFactory.create('0.3.0')
+        end
+
+        it do
+          expect(subject.size).to eq(3)
+          expect(subject[0]).to have_attributes(latest_version?: false, current_version?: nil, version_name: '0.1.0')
+          expect(subject[1]).to have_attributes(latest_version?: false, current_version?: nil, version_name: '0.2.0')
+          expect(subject[2]).to have_attributes(latest_version?: true, current_version?: nil, version_name: '0.3.0')
+        end
+      end
+
+      context 'currentディレクトリがある' do
+        before do
+          FakeVersionDirFactory.create('0.1.0')
+          FakeVersionDirFactory.create('0.2.0', symlink_to_current: true)
+          FakeVersionDirFactory.create('0.3.0')
+        end
+
+        it do
+          expect(subject.size).to eq(3)
+          expect(subject[0]).to have_attributes(latest_version?: false, current_version?: false, version_name: '0.1.0')
+          expect(subject[1]).to have_attributes(latest_version?: false, current_version?: true, version_name: '0.2.0')
+          expect(subject[2]).to have_attributes(latest_version?: true, current_version?: false, version_name: '0.3.0')
+        end
+      end
+    end
+  end
+
   describe 'integration' do
     subject do
       Pbmenv.install(target_version)
@@ -27,7 +95,7 @@ describe Pbmenv do
         expect(subject).to eq(true)
         latest_version = Pbmenv.available_versions.detect { |x| x == target_version }
         version_path = "/usr/share/pbm/v#{latest_version}"
-        expect(File.readlink("/usr/share/pbm/current")).to eq("/usr/share/pbm/v#{target_version}")
+        expect(Pbmenv.current_directory.readlink).to eq("/usr/share/pbm/v#{target_version}")
         expect(Dir.exists?(version_path)).to eq(true)
         expect(File.exists?("#{version_path}/app.rb")).to eq(true)
         expect(File.exists?("#{version_path}/README.md")).to eq(true)
@@ -52,7 +120,7 @@ describe Pbmenv do
         subject
         latest_version = Pbmenv.available_versions.first
         version_path = "/usr/share/pbm/v#{latest_version}"
-        expect(File.readlink("/usr/share/pbm/current")).to match(%r!/usr/share/pbm/v[\d.]+!)
+        expect(Pbmenv.current_directory.readlink).to match(%r!/usr/share/pbm/v[\d.]+!)
         expect(Dir.exists?(version_path)).to eq(true)
         expect(File.exists?("#{version_path}/app.rb")).to eq(true)
         expect(File.exists?("#{version_path}/README.md")).to eq(true)
@@ -77,14 +145,14 @@ describe Pbmenv do
 
         it 'currentにシムリンクが貼っている' do
           subject
-          expect(File.readlink("/usr/share/pbm/current")).to eq("/usr/share/pbm/v0.1.6")
+          expect(Pbmenv.current_directory.readlink).to eq("/usr/share/pbm/v0.1.6")
         end
 
         context 'インストールしていないバージョンをuseするとき' do
           it 'currentのシムリンクを更新しない' do
             subject
             Pbmenv.use("0.1.7")
-            expect(File.readlink("/usr/share/pbm/current")).to eq("/usr/share/pbm/v0.1.6")
+            expect(Pbmenv.current_directory.readlink).to eq("/usr/share/pbm/v0.1.6")
           end
         end
 
@@ -92,7 +160,7 @@ describe Pbmenv do
           it 'currentにシムリンクを貼る' do
             subject
             Pbmenv.use("v0.1.6")
-            expect(File.readlink("/usr/share/pbm/current")).to eq("/usr/share/pbm/v0.1.6")
+            expect(Pbmenv.current_directory.readlink).to eq("/usr/share/pbm/v0.1.6")
           end
         end
       end
@@ -106,7 +174,7 @@ describe Pbmenv do
 
         it '最後のバージョンでcurrentにシムリンクが貼っている' do
           subject
-          expect(File.readlink("/usr/share/pbm/current")).to eq("/usr/share/pbm/v0.1.6")
+          expect(Pbmenv.current_directory.readlink).to eq("/usr/share/pbm/v0.1.6")
         end
       end
     end
@@ -133,7 +201,7 @@ describe Pbmenv do
 
       it 'currentに0.1.6のシムリンクは貼らない' do
         subject
-        expect(File.readlink("/usr/share/pbm/current")).to eq("/usr/share/pbm/v0.1.6")
+        expect(Pbmenv.current_directory.readlink).to eq("/usr/share/pbm/v0.1.6")
       end
 
       # すでに別のバージョンが入っていないとuseが実行されるので、別のバージョンが入っている必要がある
@@ -142,7 +210,7 @@ describe Pbmenv do
 
         it 'currentに0.1.20.1のシムリンクは貼る' do
           subject
-          expect(File.readlink("/usr/share/pbm/current")).to eq("/usr/share/pbm/v0.1.20.1")
+          expect(Pbmenv.current_directory.readlink).to eq("/usr/share/pbm/v0.1.20.1")
         end
       end
     end
