@@ -21,6 +21,7 @@ gem 'pbmenv'
         * そのまま/usr/share/pbm/currentディレクトリへのシンボリックリンクを貼ります
     * pbmenv use $version
     * pbmenv uninstall $version
+    * pbmenv clean $version_size_to_keep
 * API
     * Pbmenv.available_versions
         * https://github.com/splaplapla/procon_bypass_man/tags からバージョンのリストを取ってくる
@@ -34,6 +35,9 @@ gem 'pbmenv'
     * Pbmenv.uninstall(version)
         * /usr/share/pbm/current が削除対象だったら例外を投げる
         * /usr/share/pbm/#{version} を 削除する
+    * Pbmenv.clean(version_size_to_keep)
+        * 古いバージョンをversion_size_to_keepの数だけ削除します
+        * currentと最新のディレクトリは削除対象外です
 
 ## Contributing
 
@@ -48,3 +52,8 @@ The gem is available as open source under the terms of the [MIT License](https:/
 * docker-compose run app bash
 * bin/rspec
   * also `DISABLE_DEBUG_LOG=1 bin/rspec`
+
+### ローカルでgemをインストールして動作確認をする
+* rake build
+* gem i --local pkg/pbmenv-x.y.z.gem
+* pbmenv ...

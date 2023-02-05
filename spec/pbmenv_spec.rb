@@ -32,7 +32,7 @@ describe Pbmenv do
         it do
           expect(subject.size).to eq(1)
           version_object = subject.last
-          expect(version_object).to have_attributes(latest_version?: true, current_version?: nil, version_name: '0.1.0')
+          expect(version_object).to have_attributes(latest_version?: true, current_version?: false, version_name: '0.1.0')
         end
       end
 
@@ -59,9 +59,9 @@ describe Pbmenv do
 
         it do
           expect(subject.size).to eq(3)
-          expect(subject[0]).to have_attributes(latest_version?: false, current_version?: nil, version_name: '0.1.0')
-          expect(subject[1]).to have_attributes(latest_version?: false, current_version?: nil, version_name: '0.2.0')
-          expect(subject[2]).to have_attributes(latest_version?: true, current_version?: nil, version_name: '0.3.0')
+          expect(subject[0]).to have_attributes(latest_version?: false, current_version?: false, version_name: '0.1.0')
+          expect(subject[1]).to have_attributes(latest_version?: false, current_version?: false, version_name: '0.2.0')
+          expect(subject[2]).to have_attributes(latest_version?: true, current_version?: false, version_name: '0.3.0')
         end
       end
 
@@ -270,6 +270,65 @@ describe Pbmenv do
           # 特定行をコメントアウトしていること
           expect(File.read("#{a_pbm_path}/app.rb")).to match(%r!^  # config.api_servers = \['https://pbm-cloud.herokuapp.com'\]$!)
         end
+      end
+    end
+  end
+
+  describe '.clean' do
+    before do
+      FakeVersionDirFactory.create('0.0.1', symlink_to_current: true)
+      %w(
+        0.10.1
+        0.2.2
+        0.2.3
+        0.2.4
+        0.2.5
+        0.2.6
+        0.2.7
+        0.2.8
+        0.2.11
+        0.2.12
+        0.2.13
+        0.2.14
+        0.2.15
+        0.2.16
+      ).each do |version_name|
+        FakeVersionDirFactory.create(version_name)
+      end
+    end
+
+    subject { Pbmenv.clean(keep_versions_size) }
+
+    context '入力が残っているバージョンの数を超えているとき' do
+      let(:keep_versions_size) { 20 }
+
+      it '削除しない' do
+        expect { subject }.not_to change { Pbmenv.installed_versions.size }
+      end
+    end
+
+    context '入力が0のとき' do
+      let(:keep_versions_size) { 0 }
+
+      it '最新とcurrentを残す' do
+        subject
+        actual = Pbmenv.installed_versions
+        expect(actual.size).to eq(2)
+        expect(actual[0]).to have_attributes(latest_version?: false, current_version?: true, version_name: '0.0.1')
+        expect(actual[1]).to have_attributes(latest_version?: true, current_version?: false, version_name: '0.10.1')
+      end
+    end
+
+    context '入力が10のとき' do
+      let(:keep_versions_size) { 5 }
+
+      it '最新とcurrentを残す' do
+        subject
+        actual = Pbmenv.installed_versions
+        expect(actual.size).to eq(7)
+        expect(actual.map(&:name)).to eq(
+          ["0.0.1", "0.2.2", "0.2.3", "0.2.4", "0.2.5", "0.2.6", "0.10.1"]
+        )
       end
     end
   end
