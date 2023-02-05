@@ -52,3 +52,8 @@ The gem is available as open source under the terms of the [MIT License](https:/
 * docker-compose run app bash
 * bin/rspec
   * also `DISABLE_DEBUG_LOG=1 bin/rspec`
+
+### ローカルでgemをインストールして動作確認をする
+* rake build
+* gem i --local pkg/pbmenv-x.y.z.gem
+* pbmenv ...
