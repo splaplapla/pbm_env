@@ -8,6 +8,8 @@ require_relative "pbmenv/cli"
 require_relative "pbmenv/pbm"
 require_relative "pbmenv/helper"
 require_relative "pbmenv/version_pathname"
+require_relative "pbmenv/version_object"
+require_relative "pbmenv/directory_object"
 require_relative "pbmenv/services/create_version_service"
 require_relative "pbmenv/services/destroy_version_service"
 require_relative "pbmenv/services/use_version_service"
@@ -16,12 +18,32 @@ require_relative "pbmenv/services/download_src_service"
 module Pbmenv
   PBM_DIR = "/usr/share/pbm"
 
+  # @return [Pbmenv::DirectoryObject]
+  def self.current_directory
+    Pbmenv::DirectoryObject.new(path: File.join(PBM_DIR, 'current'))
+  end
+
   def self.available_versions
     Pbmenv::PBM.new.available_versions.map { |x| x["name"] =~ /^v([\d.]+)/ && $1 }.compact
   end
 
+  # @return [Array<Pbmenv::VersionObject>]
+  def self.installed_versions
+    unsorted_dirs = Dir.glob("#{Pbmenv::PBM_DIR}/v*")
+    sorted_version_names = unsorted_dirs.map { |name| Pathname.new(name).basename.to_s =~ /^v([\d.]+)/ && $1 }.compact.sort_by {|x| Gem::Version.new(x) }
+    sorted_version_names.map do |version_name|
+      VersionObject.new(
+        version_name: version_name,
+        is_latest: sorted_version_names.last == version_name,
+        is_current: Pbmenv.current_directory.readlink&.end_with?(version_name),
+      )
+    end
+  end
+
+  # @deprecated
   def self.versions
-    Pbmenv::PBM.new.versions.map { |name| Pathname.new(name).basename.to_s =~ /^v([\d.]+)/ && $1 }.compact.sort_by {|x| Gem::Version.new(x) }.compact
+    unsorted_dirs = Dir.glob("#{Pbmenv::PBM_DIR}/v*")
+    unsorted_dirs.map { |name| Pathname.new(name).basename.to_s =~ /^v([\d.]+)/ && $1 }.compact.sort_by {|x| Gem::Version.new(x) }.compact
   end
 
   def self.install(version, use_option: false, enable_pbm_cloud: false)
