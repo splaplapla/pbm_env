@@ -11,7 +11,20 @@ describe Pbmenv do
 
   before(:each) do
     allow(Pbmenv::Helper).to receive(:to_stdout) if ENV["DISABLE_DEBUG_LOG"]
+    allow(Pbmenv).to receive(:available_versions) {
+      ["0.3.7", "0.3.6", "0.3.5", "0.3.4", "0.3.3.1", "0.3.3", "0.3.2", "0.3.1", "0.3.0", "0.2.3", "0.2.2", "0.2.1", "0.2.0", "0.1.23", "0.1.22", "0.1.21", "0.1.20.2", "0.1.20.1", "0.1.20", "0.1.19.1", "0.1.19", "0.1.18", "0.1.17", "0.1.16.1", "0.1.16", "0.1.15", "0.1.14", "0.1.13", "0.1.12", "0.1.11"]
+    }
     purge_pbm_dir
+  end
+
+  describe '.available_versions'do
+    subject { Pbmenv.available_versions }
+
+    it 'エラーが起きないこと' do
+      # rate limitに引っかからないようにここだけは実際にapi callする
+      allow(Pbmenv).to receive(:available_versions).and_call_original
+      subject
+    end
   end
 
   describe '.installed_versions' do
