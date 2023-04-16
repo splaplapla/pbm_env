@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    pbmenv (0.1.11)
+    pbmenv (0.1.12)
 
 GEM
   remote: https://rubygems.org/
