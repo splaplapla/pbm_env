@@ -23,7 +23,7 @@ module Pbmenv
       end
 
       if Helper.system_and_puts(shell)
-        unless File.exists?(pathname.src_pbm_project_template_path)
+        unless File.exist?(pathname.src_pbm_project_template_path)
           raise NotSupportVersionError, "This version is not support by pbmenv"
         end
       else

@@ -20,7 +20,7 @@ module Pbmenv
     def throw_error_if_has_not_version
       version_pathname = VersionPathname.new(version)
 
-      if !File.exists?(version_pathname.version_path_without_v) && !File.exists?(version_pathname.version_path)
+      if !File.exist?(version_pathname.version_path_without_v) && !File.exist?(version_pathname.version_path)
         raise UseVersionService::VersionNotFoundError
       end
     end

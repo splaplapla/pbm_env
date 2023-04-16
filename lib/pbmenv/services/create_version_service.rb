@@ -15,7 +15,7 @@ module Pbmenv
 
     def execute!
       pathname = VersionPathname.new(version)
-      if File.exists?(pathname.version_path)
+      if File.exist?(pathname.version_path)
         raise AlreadyCreatedError
       end
 
@@ -33,7 +33,7 @@ module Pbmenv
         Helper.system_and_puts "rm -rf #{pathname.version_path}"
         raise
       ensure
-        if Dir.exists?(pathname.src_pbm_path)
+        if Dir.exist?(pathname.src_pbm_path)
           Helper.system_and_puts "rm -rf #{pathname.src_pbm_path}"
         end
       end
@@ -53,7 +53,7 @@ module Pbmenv
       Helper.system_and_puts "mkdir -p #{pathname.version_path}"
       Helper.system_and_puts "cp -r #{pathname.src_project_template_systemd_units} #{pathname.version_path}/"
 
-      if File.exists?(pathname.src_pbm_project_template_app_rb_erb_path)
+      if File.exist?(pathname.src_pbm_project_template_app_rb_erb_path)
         pathname.project_template_file_paths(include_app_erb: true).each do |project_template_file_path|
           Helper.system_and_puts "cp #{project_template_file_path} #{pathname.version_path}/"
         end
@@ -80,7 +80,7 @@ module Pbmenv
     end
 
     def create_if_miss_shared_dir
-      return if File.exists?(VersionPathname.shared)
+      return if File.exist?(VersionPathname.shared)
 
       Helper.system_and_puts <<~SHELL
           mkdir -p #{VersionPathname.shared}
@@ -89,7 +89,7 @@ module Pbmenv
 
     def create_if_miss_device_id_file
       device_id_path_in_shared = VersionPathname.device_id_path_in_shared
-      return if File.exists?(device_id_path_in_shared)
+      return if File.exist?(device_id_path_in_shared)
 
       File.write(device_id_path_in_shared, "d_#{SecureRandom.uuid}")
     end
@@ -103,7 +103,7 @@ module Pbmenv
 
     def create_if_miss_current_dir(version: )
       # 初回だけinstall時にcurrentを作成する
-      if !File.exists?(VersionPathname.current) || use_option
+      if !File.exist?(VersionPathname.current) || use_option
         UseVersionService.new(version: version).execute!
       end
     end
