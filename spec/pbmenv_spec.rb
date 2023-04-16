@@ -109,11 +109,11 @@ describe Pbmenv do
         latest_version = Pbmenv.available_versions.detect { |x| x == target_version }
         version_path = "/usr/share/pbm/v#{latest_version}"
         expect(Pbmenv.current_directory.readlink).to eq("/usr/share/pbm/v#{target_version}")
-        expect(Dir.exists?(version_path)).to eq(true)
-        expect(File.exists?("#{version_path}/app.rb")).to eq(true)
-        expect(File.exists?("#{version_path}/README.md")).to eq(true)
-        expect(File.exists?("#{version_path}/setting.yml")).to eq(true)
-        expect(Dir.exists?("/usr/share/pbm/shared")).to eq(true)
+        expect(Dir.exist?(version_path)).to eq(true)
+        expect(File.exist?("#{version_path}/app.rb")).to eq(true)
+        expect(File.exist?("#{version_path}/README.md")).to eq(true)
+        expect(File.exist?("#{version_path}/setting.yml")).to eq(true)
+        expect(Dir.exist?("/usr/share/pbm/shared")).to eq(true)
         expect(File.read("/usr/share/pbm/shared/device_id")).to be_a(String)
       end
     end
@@ -134,11 +134,11 @@ describe Pbmenv do
         latest_version = Pbmenv.available_versions.first
         version_path = "/usr/share/pbm/v#{latest_version}"
         expect(Pbmenv.current_directory.readlink).to match(%r!/usr/share/pbm/v[\d.]+!)
-        expect(Dir.exists?(version_path)).to eq(true)
-        expect(File.exists?("#{version_path}/app.rb")).to eq(true)
-        expect(File.exists?("#{version_path}/README.md")).to eq(true)
-        expect(File.exists?("#{version_path}/setting.yml")).to eq(true)
-        expect(Dir.exists?("/usr/share/pbm/shared")).to eq(true)
+        expect(Dir.exist?(version_path)).to eq(true)
+        expect(File.exist?("#{version_path}/app.rb")).to eq(true)
+        expect(File.exist?("#{version_path}/README.md")).to eq(true)
+        expect(File.exist?("#{version_path}/setting.yml")).to eq(true)
+        expect(Dir.exist?("/usr/share/pbm/shared")).to eq(true)
         expect(File.read("/usr/share/pbm/shared/device_id")).to be_a(String)
       end
     end
@@ -265,7 +265,7 @@ describe Pbmenv do
         it "URLの行がアンコメントアウトされていること" do
           subject
           a_pbm_path = "/usr/share/pbm/v#{target_version}"
-          expect(File.exists?("#{a_pbm_path}/app.rb.erb")).to eq(false)
+          expect(File.exist?("#{a_pbm_path}/app.rb.erb")).to eq(false)
           # 特定行をアンコメントしていること
           expect(File.read("#{a_pbm_path}/app.rb")).to match(%r!^  config.api_servers = \['https://pbm-cloud.herokuapp.com'\]$!)
         end
@@ -279,7 +279,7 @@ describe Pbmenv do
         it "URLの行がコメントアウトされていること" do
           subject
           a_pbm_path = "/usr/share/pbm/v#{target_version}"
-          expect(File.exists?("#{a_pbm_path}/app.rb.erb")).to eq(false)
+          expect(File.exist?("#{a_pbm_path}/app.rb.erb")).to eq(false)
           # 特定行をコメントアウトしていること
           expect(File.read("#{a_pbm_path}/app.rb")).to match(%r!^  # config.api_servers = \['https://pbm-cloud.herokuapp.com'\]$!)
         end
