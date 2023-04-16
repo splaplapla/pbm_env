@@ -13,7 +13,7 @@ module Pbmenv
     def execute!
       version_pathname = VersionPathname.new(version)
 
-      unless File.exists?(version_pathname.version_path)
+      unless File.exist?(version_pathname.version_path)
         raise VersionNotFoundError
       end
       Helper.system_and_puts "rm -rf #{version_pathname.version_path}"
