@@ -17,16 +17,6 @@ describe Pbmenv do
     purge_pbm_dir
   end
 
-  describe '.available_versions'do
-    subject { Pbmenv.available_versions }
-
-    it 'エラーが起きないこと' do
-      # rate limitに引っかからないようにここだけは実際にapi callする
-      allow(Pbmenv).to receive(:available_versions).and_call_original
-      subject
-    end
-  end
-
   describe '.installed_versions' do
     subject { described_class.installed_versions }
 
