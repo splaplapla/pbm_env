@@ -1,0 +1,223 @@
+module Pbmenv
+  PBM_DIR: "/usr/share/pbm"
+
+  DEFAULT_PBM_DIR: untyped
+
+  # @param [String] to_dir
+  # @return [void]
+  # NOTE: テスト用
+  def self.chdir: (untyped to_dir) -> untyped
+
+  # @return [String]
+  def self.pbm_dir: () -> untyped
+
+  # @return [Pbmenv::DirectoryObject]
+  def self.current_directory: () -> untyped
+
+  def self.available_versions: () -> untyped
+
+  # @return [Array<Pbmenv::VersionObject>]
+  def self.installed_versions: () -> untyped
+
+  # @deprecated
+  def self.versions: () -> untyped
+
+  def self.install: (untyped version, ?use_option: bool, ?enable_pbm_cloud: bool) -> (false | untyped)
+
+  # TODO: 引数がcurrentを指しているバージョンはどうする？
+  def self.uninstall: (untyped version) -> (false | untyped)
+
+  def self.use: (untyped version) -> (false | untyped)
+
+  # @param [Integer] keep_versions_size
+  # @return [void]
+  def self.clean: (untyped keep_versions_size) -> (nil | untyped)
+end
+
+module Pbmenv
+  class CLI
+    def self.run: (untyped argv) -> untyped
+  end
+end
+
+module Pbmenv
+  class DirectoryObject
+    class NonSymlinkError < StandardError
+    end
+
+    def initialize: (path: untyped) -> void
+
+    def path: () -> untyped
+
+    # @return [String]
+    def readlink!: () -> untyped
+
+    # @return [String, NilClass]
+    def readlink: () -> untyped
+
+    private
+
+    # @return [Boolean]
+    def symlink?: () -> untyped
+  end
+end
+
+module Pbmenv
+  class Helper
+    def self.system_and_puts: (untyped shell) -> untyped
+
+    def self.to_stdout: (untyped text) -> untyped
+
+    def self.normalize_version: (untyped version) -> untyped
+  end
+end
+
+module Pbmenv
+  class PBM
+    # @return [Array<String>] githubに問い合わせて、利用可能なバージョンのリストを返す
+    def available_versions: () -> untyped
+  end
+end
+
+module Pbmenv
+  class CreateVersionService
+    class AlreadyCreatedError < StandardError
+    end
+
+    class NotSupportVersionError < StandardError
+    end
+
+    attr_accessor version: untyped
+
+    attr_accessor use_option: untyped
+
+    attr_accessor enable_pbm_cloud: untyped
+
+    def initialize: (version: untyped, use_option: untyped, enable_pbm_cloud: untyped) -> void
+
+    def execute!: () -> true
+
+    private
+
+    # @return [String]
+    def download_src: (untyped version) -> untyped
+
+    def build_app_file: () -> untyped
+
+    def create_if_miss_shared_dir: () -> (nil | untyped)
+
+    def create_if_miss_device_id_file: () -> (nil | untyped)
+
+    def link_device_id_file: (version: untyped) -> untyped
+
+    def create_if_miss_current_dir: (version: untyped) -> (untyped | nil)
+  end
+end
+
+module Pbmenv
+  class DestroyVersionService
+    class VersionNotFoundError < StandardError
+    end
+
+    attr_accessor version: untyped
+
+    def initialize: (version: untyped) -> void
+
+    def execute!: () -> untyped
+  end
+end
+
+module Pbmenv
+  class DownloadSrcService
+    class DownloadError < StandardError
+    end
+
+    attr_accessor version: untyped
+
+    def initialize: (untyped version) -> void
+
+    def execute!: () -> untyped
+  end
+end
+
+module Pbmenv
+  class UseVersionService
+    class VersionNotFoundError < StandardError
+    end
+
+    attr_accessor version: untyped
+
+    def initialize: (version: untyped) -> void
+
+    def execute!: () -> untyped
+
+    private
+
+    def throw_error_if_has_not_version: () -> untyped
+
+    def relink_current_path: () -> untyped
+  end
+end
+
+module Pbmenv
+  VERSION: "0.1.12"
+end
+
+module Pbmenv
+  class VersionObject
+    # @param [String] version_name
+    # @param [Boolean] is_latest
+    # @param [Boolean] is_current
+    def initialize: (version_name: untyped, is_latest: untyped, is_current: untyped) -> void
+
+    # @return [String]
+    def version_name: () -> untyped
+
+    # alias
+    def name: () -> untyped
+
+    # @return [Boolean]
+    def current_version?: () -> untyped
+
+    # @return [Boolean]
+    def latest_version?: () -> untyped
+  end
+end
+
+module Pbmenv
+  class VersionPathname
+    attr_accessor version: untyped
+
+    def initialize: (untyped version) -> void
+
+    def version_path: () -> untyped
+
+    def version_path_without_v: () -> untyped
+
+    def app_rb_path: () -> untyped
+
+    def app_rb_erb_path: () -> untyped
+
+    def device_id_path_in_version: () -> untyped
+
+    def src_pbm_path: () -> untyped
+
+    def project_template_file_paths: (include_app_erb: untyped) -> untyped
+
+    def device_id_path_in_shared: () -> untyped
+
+    def src_pbm_project_template_path: () -> untyped
+
+    def src_pbm_project_template_app_rb_erb_path: () -> untyped
+
+    def lib_app_generator: () -> untyped
+
+    def src_project_template_systemd_units: () -> untyped
+
+    def self.device_id_path_in_shared: () -> untyped
+
+    def self.current: () -> untyped
+
+    def self.shared: () -> untyped
+  end
+end
