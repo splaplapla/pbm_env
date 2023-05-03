@@ -1,22 +1,22 @@
 RSpec.shared_examples 'correct_pbm_dir_spec' do
-  it '/usr/share/pbm/v#{target_version}/ にファイルを作成すること' do
+  it '#{Pbmenv.pbm_dir}/v#{target_version}/ にファイルを作成すること' do
     subject
-    a_pbm_path = "/usr/share/pbm/v#{target_version}"
-    expect(Dir.exist?("/usr/share/pbm/v#{target_version}")).to eq(true)
-    expect(File.exist?("/usr/share/pbm/v#{target_version}/app.rb")).to eq(true)
+    a_pbm_path = "#{Pbmenv.pbm_dir}/v#{target_version}"
+    expect(Dir.exist?("#{Pbmenv.pbm_dir}/v#{target_version}")).to eq(true)
+    expect(File.exist?("#{Pbmenv.pbm_dir}/v#{target_version}/app.rb")).to eq(true)
     expect(File.exist?("#{a_pbm_path}/README.md")).to eq(true)
     expect(File.exist?("#{a_pbm_path}/setting.yml")).to eq(true)
     expect(File.exist?("#{a_pbm_path}/systemd_units/pbm.service")).to eq(true)
   end
 
-  it '/usr/share/pbm/v#{target_version}/device_idを作成すること' do
+  it '#{Pbmenv.pbm_dir}/v#{target_version}/device_idを作成すること' do
     subject
-    expect(File.readlink("/usr/share/pbm/v#{target_version}/device_id")).to eq("/usr/share/pbm/shared/device_id")
+    expect(File.readlink("#{Pbmenv.pbm_dir}/v#{target_version}/device_id")).to eq("#{Pbmenv.pbm_dir}/shared/device_id")
   end
 
-  it '/usr/share/pbm/shared/device_idを作成すること' do
+  it '#{Pbmenv.pbm_dir}/shared/device_idを作成すること' do
     subject
-    expect(File.read("/usr/share/pbm/shared/device_id")).to be_a(String)
+    expect(File.read("#{Pbmenv.pbm_dir}/shared/device_id")).to be_a(String)
   end
 
   it '解凍したファイルを削除していること' do
