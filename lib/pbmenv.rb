@@ -16,7 +16,23 @@ require_relative "pbmenv/services/use_version_service"
 require_relative "pbmenv/services/download_src_service"
 
 module Pbmenv
-  PBM_DIR = "/usr/share/pbm"
+  PBM_DIR = "/usr/share/pbm" # NOTE: pbmから参照している
+  DEFAULT_PBM_DIR = PBM_DIR
+
+  @current_pbm_dir = DEFAULT_PBM_DIR
+
+  # @param [String] to_dir
+  # @return [void]
+  # NOTE: テスト用
+  def self.chdir(to_dir)
+    raise(ArgumentError, 'テスト以外では実行できません') unless defined?(RSpec)
+    @current_pbm_dir = to_dir
+  end
+
+  # @return [String]
+  def self.pbm_dir
+    @current_pbm_dir
+  end
 
   # @return [Pbmenv::DirectoryObject]
   def self.current_directory
@@ -29,7 +45,7 @@ module Pbmenv
 
   # @return [Array<Pbmenv::VersionObject>]
   def self.installed_versions
-    unsorted_dirs = Dir.glob("#{Pbmenv::PBM_DIR}/v*")
+    unsorted_dirs = Dir.glob("#{Pbmenv.pbm_dir}/v*")
     sorted_version_names = unsorted_dirs.map { |name| Pathname.new(name).basename.to_s =~ /^v([\d.]+)/ && $1 }.compact.sort_by {|x| Gem::Version.new(x) }
     sorted_version_names.map do |version_name|
       VersionObject.new(
@@ -42,7 +58,7 @@ module Pbmenv
 
   # @deprecated
   def self.versions
-    unsorted_dirs = Dir.glob("#{Pbmenv::PBM_DIR}/v*")
+    unsorted_dirs = Dir.glob("#{Pbmenv.pbm_dir}/v*")
     unsorted_dirs.map { |name| Pathname.new(name).basename.to_s =~ /^v([\d.]+)/ && $1 }.compact.sort_by {|x| Gem::Version.new(x) }.compact
   end
 

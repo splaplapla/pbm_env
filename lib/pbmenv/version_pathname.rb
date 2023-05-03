@@ -7,11 +7,11 @@ module Pbmenv
     end
 
     def version_path
-      File.join(PBM_DIR, "v#{version}")
+      File.join(Pbmenv.pbm_dir, "v#{version}")
     end
 
     def version_path_without_v
-      File.join(PBM_DIR, "#{version}")
+      File.join(Pbmenv.pbm_dir, "#{version}")
     end
 
     def app_rb_path
@@ -65,11 +65,11 @@ module Pbmenv
     end
 
     def self.current
-      File.join(PBM_DIR, "current")
+      File.join(Pbmenv.pbm_dir, "current")
     end
 
     def self.shared
-      File.join(PBM_DIR, "shared")
+      File.join(Pbmenv.pbm_dir, "shared")
     end
   end
 end

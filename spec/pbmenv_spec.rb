@@ -2,11 +2,7 @@ require "spec_helper"
 
 describe Pbmenv do
   def purge_pbm_dir
-    `rm -rf /usr/share/pbm`
-  end
-
-  before do
-    raise("ファイルを読み書きするのでmacではやらない方がいいです") unless ENV["CI"]
+    `rm -rf #{Pbmenv.pbm_dir}`
   end
 
   before(:each) do
@@ -97,14 +93,14 @@ describe Pbmenv do
       it 'currentにシムリンクが貼っている' do
         expect(subject).to eq(true)
         latest_version = Pbmenv.available_versions.detect { |x| x == target_version }
-        version_path = "/usr/share/pbm/v#{latest_version}"
-        expect(Pbmenv.current_directory.readlink).to eq("/usr/share/pbm/v#{target_version}")
+        version_path = "#{Pbmenv.pbm_dir}/v#{latest_version}"
+        expect(Pbmenv.current_directory.readlink).to eq("#{Pbmenv.pbm_dir}/v#{target_version}")
         expect(Dir.exist?(version_path)).to eq(true)
         expect(File.exist?("#{version_path}/app.rb")).to eq(true)
         expect(File.exist?("#{version_path}/README.md")).to eq(true)
         expect(File.exist?("#{version_path}/setting.yml")).to eq(true)
-        expect(Dir.exist?("/usr/share/pbm/shared")).to eq(true)
-        expect(File.read("/usr/share/pbm/shared/device_id")).to be_a(String)
+        expect(Dir.exist?("#{Pbmenv.pbm_dir}/shared")).to eq(true)
+        expect(File.read("#{Pbmenv.pbm_dir}/shared/device_id")).to be_a(String)
       end
     end
 
@@ -122,14 +118,14 @@ describe Pbmenv do
       it 'currentにシムリンクが貼っている' do
         subject
         latest_version = Pbmenv.available_versions.first
-        version_path = "/usr/share/pbm/v#{latest_version}"
-        expect(Pbmenv.current_directory.readlink).to match(%r!/usr/share/pbm/v[\d.]+!)
+        version_path = "#{Pbmenv.pbm_dir}/v#{latest_version}"
+        expect(Pbmenv.current_directory.readlink).to match(%r!#{Pbmenv.pbm_dir}/v[\d.]+!)
         expect(Dir.exist?(version_path)).to eq(true)
         expect(File.exist?("#{version_path}/app.rb")).to eq(true)
         expect(File.exist?("#{version_path}/README.md")).to eq(true)
         expect(File.exist?("#{version_path}/setting.yml")).to eq(true)
-        expect(Dir.exist?("/usr/share/pbm/shared")).to eq(true)
-        expect(File.read("/usr/share/pbm/shared/device_id")).to be_a(String)
+        expect(Dir.exist?("#{Pbmenv.pbm_dir}/shared")).to eq(true)
+        expect(File.read("#{Pbmenv.pbm_dir}/shared/device_id")).to be_a(String)
       end
     end
   end
@@ -148,14 +144,14 @@ describe Pbmenv do
 
         it 'currentにシムリンクが貼っている' do
           subject
-          expect(Pbmenv.current_directory.readlink).to eq("/usr/share/pbm/v0.1.6")
+          expect(Pbmenv.current_directory.readlink).to eq("#{Pbmenv.pbm_dir}/v0.1.6")
         end
 
         context 'インストールしていないバージョンをuseするとき' do
           it 'currentのシムリンクを更新しない' do
             subject
             Pbmenv.use("0.1.7")
-            expect(Pbmenv.current_directory.readlink).to eq("/usr/share/pbm/v0.1.6")
+            expect(Pbmenv.current_directory.readlink).to eq("#{Pbmenv.pbm_dir}/v0.1.6")
           end
         end
 
@@ -163,7 +159,7 @@ describe Pbmenv do
           it 'currentにシムリンクを貼る' do
             subject
             Pbmenv.use("v0.1.6")
-            expect(Pbmenv.current_directory.readlink).to eq("/usr/share/pbm/v0.1.6")
+            expect(Pbmenv.current_directory.readlink).to eq("#{Pbmenv.pbm_dir}/v0.1.6")
           end
         end
       end
@@ -177,7 +173,7 @@ describe Pbmenv do
 
         it '最後のバージョンでcurrentにシムリンクが貼っている' do
           subject
-          expect(Pbmenv.current_directory.readlink).to eq("/usr/share/pbm/v0.1.6")
+          expect(Pbmenv.current_directory.readlink).to eq("#{Pbmenv.pbm_dir}/v0.1.6")
         end
       end
     end
@@ -204,7 +200,7 @@ describe Pbmenv do
 
       it 'currentに0.1.6のシムリンクは貼らない' do
         subject
-        expect(Pbmenv.current_directory.readlink).to eq("/usr/share/pbm/v0.1.6")
+        expect(Pbmenv.current_directory.readlink).to eq("#{Pbmenv.pbm_dir}/v0.1.6")
       end
 
       # すでに別のバージョンが入っていないとuseが実行されるので、別のバージョンが入っている必要がある
@@ -213,7 +209,7 @@ describe Pbmenv do
 
         it 'currentに0.1.20.1のシムリンクは貼る' do
           subject
-          expect(Pbmenv.current_directory.readlink).to eq("/usr/share/pbm/v0.1.20.1")
+          expect(Pbmenv.current_directory.readlink).to eq("#{Pbmenv.pbm_dir}/v0.1.20.1")
         end
       end
     end
@@ -238,7 +234,7 @@ describe Pbmenv do
       it "URLの行がアンコメントアウトされていること" do
         subject
         target_version = decompress_procon_pbm_man_versions.first
-        a_pbm_path = "/usr/share/pbm/v#{target_version}"
+        a_pbm_path = "#{Pbmenv.pbm_dir}/v#{target_version}"
         expect(File.read("#{a_pbm_path}/app.rb")).to match(%r!^  config.api_servers = 'https://pbm-cloud.herokuapp.com'$!)
       end
     end
@@ -254,7 +250,7 @@ describe Pbmenv do
 
         it "URLの行がアンコメントアウトされていること" do
           subject
-          a_pbm_path = "/usr/share/pbm/v#{target_version}"
+          a_pbm_path = "#{Pbmenv.pbm_dir}/v#{target_version}"
           expect(File.exist?("#{a_pbm_path}/app.rb.erb")).to eq(false)
           # 特定行をアンコメントしていること
           expect(File.read("#{a_pbm_path}/app.rb")).to match(%r!^  config.api_servers = \['https://pbm-cloud.herokuapp.com'\]$!)
@@ -268,7 +264,7 @@ describe Pbmenv do
 
         it "URLの行がコメントアウトされていること" do
           subject
-          a_pbm_path = "/usr/share/pbm/v#{target_version}"
+          a_pbm_path = "#{Pbmenv.pbm_dir}/v#{target_version}"
           expect(File.exist?("#{a_pbm_path}/app.rb.erb")).to eq(false)
           # 特定行をコメントアウトしていること
           expect(File.read("#{a_pbm_path}/app.rb")).to match(%r!^  # config.api_servers = \['https://pbm-cloud.herokuapp.com'\]$!)
@@ -332,6 +328,16 @@ describe Pbmenv do
         expect(actual.map(&:name)).to eq(
           ["0.0.1", "0.2.2", "0.2.3", "0.2.4", "0.2.5", "0.2.6", "0.10.1"]
         )
+      end
+    end
+
+    describe '.chdir' do
+      subject { Pbmenv.chdir('/dist_path') }
+
+      it do
+        expect(Pbmenv.pbm_dir).to eq('/tmp/pbm')
+        subject
+        expect(Pbmenv.pbm_dir).to eq('/dist_path')
       end
     end
   end
