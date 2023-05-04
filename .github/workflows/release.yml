@@ -1,8 +1,6 @@
 name: Publish to RubyGems
 
 on:
-  schedule:
-    - cron: '0 0 */1 * *' # runs daily
   workflow_dispatch:
 
 jobs:
