@@ -24,7 +24,7 @@ module Pbmenv
 
       if Helper.system_and_puts(shell)
         unless File.exist?(pathname.src_pbm_project_template_path)
-          raise NotSupportVersionError, "This version is not support by pbmenv"
+          raise Pbmenv::CreateVersionService::NotSupportVersionError, "This version is not support by pbmenv"
         end
       else
         raise DownloadError
