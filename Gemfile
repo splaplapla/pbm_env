@@ -9,5 +9,8 @@ gem "rake"
 gem "rspec"
 gem "pry"
 
-gem 'rbs', require: false
-gem "steep", require: false
+
+group :typecheck do
+  gem 'rbs', require: false
+  gem "steep", require: false
+end
