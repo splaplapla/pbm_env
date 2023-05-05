@@ -50,7 +50,10 @@ module Pbmenv
 
     def build_app_file
       pathname = VersionPathname.new(version)
-      Helper.system_and_puts "mkdir -p #{pathname.version_path}"
+      unless Helper.system_and_puts "mkdir -p #{pathname.version_path}"
+        raise "Insufficient permissions..."
+      end
+
       Helper.system_and_puts "cp -r #{pathname.src_project_template_systemd_units} #{pathname.version_path}/"
 
       if File.exist?(pathname.src_pbm_project_template_app_rb_erb_path)
