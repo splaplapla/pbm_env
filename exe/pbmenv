@@ -4,4 +4,8 @@
 require "bundler/setup"
 require "pbmenv"
 
-Pbmenv::CLI.run ARGV
+begin
+  Pbmenv::CLI.run(ARGV)
+rescue Pbmenv::CLI::CLIError
+  exit 1
+end

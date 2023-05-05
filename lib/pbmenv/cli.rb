@@ -1,5 +1,7 @@
 module Pbmenv
   class CLI
+    class CLIError < StandardError; end
+
     def self.run(argv)
       sub_command = argv[0]
       case sub_command
@@ -9,17 +11,19 @@ module Pbmenv
         Pbmenv.versions.each { |x| puts x }
       when 'install', 'i'
         sub_command_arg = argv[1]
+        use_option = false
         case argv[2]
         when "--use"
           use_option = true
         when nil
-          use_option = false
         else
           puts <<~EOH
             Unknown option:
               available options: --use
           EOH
+          raise CLIError
         end
+
         Pbmenv.install(sub_command_arg, use_option: use_option)
       when 'use', 'u'
         sub_command_arg = argv[1]
@@ -40,6 +44,7 @@ module Pbmenv
           Unknown command:
             available commands: available_versions, versions, install, use, uninstall, clean
         EOH
+        raise CLIError
       end
     end
   end
