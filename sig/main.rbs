@@ -3,10 +3,12 @@ module Pbmenv
 
   DEFAULT_PBM_DIR: untyped
 
+  self.@current_pbm_dir: String
+
   # @param [String] to_dir
   # @return [void]
   # NOTE: テスト用
-  def self.chdir: (untyped to_dir) -> untyped
+  def self.chdir: (String to_dir) -> untyped
 
   # @return [String]
   def self.pbm_dir: () -> untyped
@@ -36,12 +38,17 @@ end
 
 module Pbmenv
   class CLI
+    class CLIError < StandardError
+    end
+
     def self.run: (untyped argv) -> untyped
   end
 end
 
 module Pbmenv
   class DirectoryObject
+    @path: String
+
     class NonSymlinkError < StandardError
     end
 
@@ -145,17 +152,17 @@ module Pbmenv
     class VersionNotFoundError < StandardError
     end
 
-    attr_accessor version: untyped
+    attr_accessor version: String
 
-    def initialize: (version: untyped) -> void
+    def initialize: (version: String) -> void
 
-    def execute!: () -> untyped
+    def execute!: () -> void
 
     private
 
     def throw_error_if_has_not_version: () -> untyped
 
-    def relink_current_path: () -> untyped
+    def relink_current_path: () -> String
   end
 end
 
@@ -165,22 +172,26 @@ end
 
 module Pbmenv
   class VersionObject
+    @is_current: bool
+    @is_latest: bool
+    @version_name: String
+
     # @param [String] version_name
     # @param [Boolean] is_latest
     # @param [Boolean] is_current
-    def initialize: (version_name: untyped, is_latest: untyped, is_current: untyped) -> void
+    def initialize: (version_name: String, is_latest: bool, is_current: bool) -> void
 
     # @return [String]
-    def version_name: () -> untyped
+    def version_name: () -> String
 
     # alias
-    def name: () -> untyped
+    def name: () -> String
 
     # @return [Boolean]
-    def current_version?: () -> untyped
+    def current_version?: () -> bool
 
     # @return [Boolean]
-    def latest_version?: () -> untyped
+    def latest_version?: () -> bool
   end
 end
 
@@ -188,7 +199,7 @@ module Pbmenv
   class VersionPathname
     attr_accessor version: untyped
 
-    def initialize: (untyped version) -> void
+    def initialize: (String version) -> void
 
     def version_path: () -> untyped
 
@@ -214,10 +225,25 @@ module Pbmenv
 
     def src_project_template_systemd_units: () -> untyped
 
-    def self.device_id_path_in_shared: () -> untyped
+    def self.device_id_path_in_shared: () -> String
 
-    def self.current: () -> untyped
+    def self.current: () -> String
 
-    def self.shared: () -> untyped
+    def self.shared: () -> String
   end
+end
+
+
+module URI
+  def self.open: (String url) -> untyped
+end
+
+module RSpec
+end
+
+
+class AppGenerator
+  def initialize: (prefix_path: String, enable_integration_with_pbm_cloud: bool) -> void
+
+  def generate: () -> void
 end

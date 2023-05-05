@@ -5,10 +5,11 @@ target :lib do
 
   check "lib"                       # Directory name
   # check "Gemfile"                   # File name
-  check "app/models/**/*.rb"        # Glob
+  # check "app/models/**/*.rb"        # Glob
   # ignore "lib/templates/*.rb"
 
-  # library "pathname", "set"       # Standard libraries
+  library "json", "uri", "pathname", "securerandom"
+
   # library "strong_json"           # Gems
   
   # configure_code_diagnostics(D::Ruby.strict)       # `strict` diagnostics setting
@@ -22,6 +23,4 @@ end
 #   signature "sig", "sig-private"
 #
 #   check "test"
-#
-#   # library "pathname", "set"       # Standard libraries
 # end
