@@ -171,7 +171,7 @@ module Pbmenv
 end
 
 module Pbmenv
-  VERSION: "0.1.12"
+  VERSION: String
 end
 
 module Pbmenv
