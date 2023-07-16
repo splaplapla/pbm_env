@@ -7,7 +7,7 @@ RSpec.shared_context 'decompress_procon_pbm_man' do
     allow(Pbmenv::DownloadSrcService).to receive(:new) { service }
 
     decompress_procon_pbm_man_versions.each do |version|
-      system "tar zxvf ./spec/files/procon_bypass_man-#{version}.tar.gz -C /tmp > /dev/null"
+      system "tar zxvf ./spec/files/procon_bypass_man-#{version}.tar.gz -C /tmp > /dev/null 2>&1"
     end
   end
 

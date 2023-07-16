@@ -2,6 +2,7 @@
 
 require "securerandom"
 require "pathname"
+require "logger"
 
 require_relative "pbmenv/version"
 require_relative "pbmenv/cli"
@@ -19,7 +20,16 @@ module Pbmenv
   PBM_DIR = "/usr/share/pbm" # NOTE: pbmから参照している
   DEFAULT_PBM_DIR = PBM_DIR
 
+  class << self
+    attr_accessor :logger
+  end
+
   @current_pbm_dir = DEFAULT_PBM_DIR
+
+  self.logger = Logger.new($stdout)
+  self.logger.formatter = proc do |severity, datetime, progname, message|
+    "#{message}\n"
+  end
 
   # @param [String] to_dir
   # @return [void]
@@ -32,6 +42,14 @@ module Pbmenv
   # @return [String]
   def self.pbm_dir
     @current_pbm_dir
+  end
+
+  # @return [void]
+  def self.slice_logger
+    previous_logger = self.logger
+    self.logger = Logger.new(File.open(File::NULL, "w"))
+    yield
+    self.logger = previous_logger
   end
 
   # @return [Pbmenv::DirectoryObject]
@@ -56,10 +74,10 @@ module Pbmenv
     end
   end
 
-  # @deprecated
-  def self.versions
-    unsorted_dirs = Dir.glob("#{Pbmenv.pbm_dir}/v*")
-    unsorted_dirs.map { |name| Pathname.new(name).basename.to_s =~ /^v([\d.]+)/ && $1 }.compact.sort_by {|x| Gem::Version.new(x) }.compact
+  def self.command_versions
+    self.installed_versions.map do |version|
+      version.current_version? ? "* #{version.name}" : "  #{version.name}"
+    end
   end
 
   def self.install(version, use_option: false, enable_pbm_cloud: false)
@@ -96,7 +114,7 @@ module Pbmenv
     raise "Need a version" if version.nil?
     version =
       if version == 'latest'
-        self.versions.last
+        self.installed_versions.last.name
       else
         Helper.normalize_version(version) or raise "mismatch version number!"
       end

@@ -5,6 +5,11 @@ module Pbmenv
 
   self.@current_pbm_dir: String
 
+  @logger: Logger
+
+  def self.logger: () -> Logger
+  def self.logger=: (Logger) -> void
+
   # @param [String] to_dir
   # @return [void]
   # NOTE: テスト用
@@ -21,8 +26,7 @@ module Pbmenv
   # @return [Array<Pbmenv::VersionObject>]
   def self.installed_versions: () -> untyped
 
-  # @deprecated
-  def self.versions: () -> untyped
+  def self.command_versions: () -> untyped
 
   def self.install: (untyped version, ?use_option: bool, ?enable_pbm_cloud: bool) -> (false | untyped)
 
