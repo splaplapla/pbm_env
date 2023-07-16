@@ -2,6 +2,7 @@
 
 require "securerandom"
 require "pathname"
+require "logger"
 
 require_relative "pbmenv/version"
 require_relative "pbmenv/cli"
@@ -20,6 +21,10 @@ module Pbmenv
   DEFAULT_PBM_DIR = PBM_DIR
 
   @current_pbm_dir = DEFAULT_PBM_DIR
+  @logger = Logger.new($stdout)
+  @logger.formatter = proc do |severity, datetime, progname, message|
+    "#{message}\n"
+  end
 
   # @param [String] to_dir
   # @return [void]
@@ -32,6 +37,24 @@ module Pbmenv
   # @return [String]
   def self.pbm_dir
     @current_pbm_dir
+  end
+
+  # @return [File, Logger]
+  def self.logger
+    @logger
+  end
+
+  # @param [File, Logger]
+  def self.logger=(logger)
+    @logger = logger
+  end
+
+  # @return [void]
+  def self.slice_logger
+    previous_logger = self.logger
+    self.logger = Logger.new(nil)
+    yield
+    self.logger = previous_logger
   end
 
   # @return [Pbmenv::DirectoryObject]

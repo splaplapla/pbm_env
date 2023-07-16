@@ -92,10 +92,12 @@ describe Pbmenv do
 
     context 'バージョンがあるとき' do
       before do
-        Pbmenv.install('0.3.9')
-        Pbmenv.install('0.3.8')
-        Pbmenv.install('0.3.8.1')
-        Pbmenv.install('0.1.23')
+        Pbmenv.slice_logger do
+          Pbmenv.install('0.3.9')
+          Pbmenv.install('0.3.8')
+          Pbmenv.install('0.3.8.1')
+          Pbmenv.install('0.1.23')
+        end
         Pbmenv.use('0.3.9')
       end
 

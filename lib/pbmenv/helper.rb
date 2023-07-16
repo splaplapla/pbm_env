@@ -6,7 +6,7 @@ module Pbmenv
     end
 
     def self.to_stdout(text)
-      puts text
+      Pbmenv.logger.info(text)
     end
 
     def self.normalize_version(version)
