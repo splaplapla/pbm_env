@@ -26,7 +26,7 @@ module Pbmenv
   # @return [Array<Pbmenv::VersionObject>]
   def self.installed_versions: () -> untyped
 
-  def self.command_list: () -> untyped
+  def self.command_versions: () -> untyped
 
   def self.install: (untyped version, ?use_option: bool, ?enable_pbm_cloud: bool) -> (false | untyped)
 
