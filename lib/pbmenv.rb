@@ -76,7 +76,7 @@ module Pbmenv
 
   def self.command_versions
     self.installed_versions.map do |version|
-      version.current_version? ? "* #{version.name}" : " #{version.name}"
+      version.current_version? ? "* #{version.name}" : "  #{version.name}"
     end
   end
 

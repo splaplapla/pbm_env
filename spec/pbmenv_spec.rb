@@ -102,7 +102,7 @@ describe Pbmenv do
       end
 
       it do
-        expect(command_versions).to eq([" 0.1.23", " 0.3.8", " 0.3.8.1", "* 0.3.9"])
+        expect(command_versions).to eq(["  0.1.23", "  0.3.8", "  0.3.8.1", "* 0.3.9"])
       end
     end
   end
