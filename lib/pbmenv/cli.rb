@@ -41,8 +41,15 @@ module Pbmenv
         puts Pbmenv::VERSION
       else
         puts <<~EOH
-          Unknown command:
-            available commands: available_versions, versions, install, use, uninstall, clean
+          Usage: pbmenv [command]
+
+          Available commands:
+            available_versions    Display the available versions of pbmenv
+            versions              List the installed versions of pbmenv
+            install               Install a specific version of pbmenv
+            use                   Set a specific version of pbmenv as the active version
+            uninstall             Uninstall a specific version of pbmenv
+            clean                 Remove old installed versions of pbmenv
         EOH
         raise CLIError
       end
