@@ -20,14 +20,15 @@ module Pbmenv
   PBM_DIR = "/usr/share/pbm" # NOTE: pbmから参照している
   DEFAULT_PBM_DIR = PBM_DIR
 
-  @current_pbm_dir = DEFAULT_PBM_DIR
-  @logger = Logger.new($stdout)
-  @logger.formatter = proc do |severity, datetime, progname, message|
-    "#{message}\n"
-  end
-
   class << self
     attr_accessor :logger
+  end
+
+  @current_pbm_dir = DEFAULT_PBM_DIR
+
+  self.logger = Logger.new($stdout)
+  self.logger.formatter = proc do |severity, datetime, progname, message|
+    "#{message}\n"
   end
 
   # @param [String] to_dir
@@ -46,7 +47,7 @@ module Pbmenv
   # @return [void]
   def self.slice_logger
     previous_logger = self.logger
-    self.logger = Logger.new(nil)
+    self.logger = Logger.new(File.open(File::NULL, "w"))
     yield
     self.logger = previous_logger
   end
