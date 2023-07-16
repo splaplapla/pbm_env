@@ -26,6 +26,10 @@ module Pbmenv
     "#{message}\n"
   end
 
+  class << self
+    attr_accessor :logger
+  end
+
   # @param [String] to_dir
   # @return [void]
   # NOTE: テスト用
@@ -37,16 +41,6 @@ module Pbmenv
   # @return [String]
   def self.pbm_dir
     @current_pbm_dir
-  end
-
-  # @return [File, Logger]
-  def self.logger
-    @logger
-  end
-
-  # @param [File, Logger]
-  def self.logger=(logger)
-    @logger = logger
   end
 
   # @return [void]
