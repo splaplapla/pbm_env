@@ -18,7 +18,7 @@ module Pbmenv
       else
         # TODO cache for testing
         shell = <<~SHELL
-          curl -L https://github.com/splaplapla/procon_bypass_man/archive/refs/tags/v#{version}.tar.gz | tar xvz -C /tmp > /dev/null
+          curl -L https://github.com/splaplapla/procon_bypass_man/archive/refs/tags/v#{version}.tar.gz | tar xvz -C /tmp > /dev/null 2>&1
         SHELL
       end
 

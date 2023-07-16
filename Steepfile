@@ -8,7 +8,7 @@ target :lib do
   # check "app/models/**/*.rb"        # Glob
   # ignore "lib/templates/*.rb"
 
-  library "json", "uri", "pathname", "securerandom"
+  library "json", "uri", "pathname", "securerandom", "logger"
 
   # library "strong_json"           # Gems
   

@@ -8,7 +8,7 @@ module Pbmenv
       when 'available_versions', 'av'
         Pbmenv.available_versions.each { |x| puts x }
       when 'versions', 'list'
-        Pbmenv.versions.each { |x| puts x }
+        Pbmenv.command_versions.each { |x| puts x }
       when 'install', 'i'
         sub_command_arg = argv[1]
         use_option = false
