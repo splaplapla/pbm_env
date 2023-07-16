@@ -56,10 +56,10 @@ module Pbmenv
     end
   end
 
-  # @deprecated
-  def self.versions
-    unsorted_dirs = Dir.glob("#{Pbmenv.pbm_dir}/v*")
-    unsorted_dirs.map { |name| Pathname.new(name).basename.to_s =~ /^v([\d.]+)/ && $1 }.compact.sort_by {|x| Gem::Version.new(x) }.compact
+  def self.command_versions
+    self.installed_versions.map do |version|
+      version.current_version? ? "* #{version.name}" : " #{version.name}"
+    end
   end
 
   def self.install(version, use_option: false, enable_pbm_cloud: false)
@@ -96,7 +96,7 @@ module Pbmenv
     raise "Need a version" if version.nil?
     version =
       if version == 'latest'
-        self.versions.last
+        self.installed_versions.last.name
       else
         Helper.normalize_version(version) or raise "mismatch version number!"
       end

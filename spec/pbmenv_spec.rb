@@ -81,6 +81,30 @@ describe Pbmenv do
     end
   end
 
+  describe '.command_versions' do
+    subject(:command_versions) { described_class.command_versions }
+
+    context 'バージョンがないとき' do
+      it do
+        expect(command_versions).to eq([])
+      end
+    end
+
+    context 'バージョンがあるとき' do
+      before do
+        Pbmenv.install('0.3.9')
+        Pbmenv.install('0.3.8')
+        Pbmenv.install('0.3.8.1')
+        Pbmenv.install('0.1.23')
+        Pbmenv.use('0.3.9')
+      end
+
+      it do
+        expect(command_versions).to eq([" 0.1.23", " 0.3.8", " 0.3.8.1", "* 0.3.9"])
+      end
+    end
+  end
+
   describe 'integration' do
     subject do
       Pbmenv.install(target_version)
